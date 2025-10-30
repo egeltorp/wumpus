@@ -35,12 +35,21 @@ class WumpusGame:
 
     def connect_rooms(self):
         number_of_connections = 4
+        safety_limit = 500
 
+        # BUGGED, sometimes causes a room to only get 2 connections instead of 4
         # Run this code for each room in self.rooms
         for room in self.rooms:
-            while len(room.connected_rooms) < number_of_connections:
+            attempts = 0
+            while len(room.connected_rooms) < number_of_connections and attempts < safety_limit:
+                attempts += 1
                 target_room = random.choice(self.rooms)
-                if target_room != room and target_room not in room.connected_rooms:
+                if (
+                    target_room != room 
+                    and target_room not in room.connected_rooms 
+                    and len(target_room.connected_rooms) < number_of_connections
+                    ):
+                    
                     room.connected_rooms.append(target_room)
                     target_room.connected_rooms.append(room)
 
