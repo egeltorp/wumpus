@@ -49,7 +49,7 @@ class WumpusGame:
         number_of_connections = 4
         safety_limit = 500
 
-        # # # BUGGED, sometimes causes a room to only get 2 connections instead of 4
+        ### BUGGED, sometimes causes a room to only get 2 connections instead of 4
 
         # Run this code for each room in self.rooms
         for room in self.rooms:
@@ -142,26 +142,40 @@ class WumpusGame:
                 ui.show_message("arrow_miss")
                 return False
 
-    def pit_kill_player(self) -> bool:
+    def check_pit_kill(self):
         if self.player.current_room.has_pit:
-            return True
-        return False
+            self.player.is_alive = False
 
-    def bats_transport_player(self) -> bool:
+    def check_bats_transport(self) -> bool:
         if self.player.current_room.has_bats:
             possible_rooms = [room for room in self.safe_rooms if room != self.player.current_room]
             self.player.current_room = random.choice(possible_rooms)
         return False
+    
+    def check_wumpus_encounter(self) -> bool:
+        if self.player.current_room.has_wumpus:
+            self.player.is_alive = False
 
-    def check_win_lose(self):
-        # Determine if the player has won or lost
-        pass
+    def check_game_state(self):
+        # if player is dead, they lose
+        if not self.player.is_alive:
+            return "lose"
+        
+        # if Wumpus is dead, player wins
+        if any(room.has_wumpus == False for room in self.rooms):
+            return "win"
+        
+        # otherwise, game continues
+        return "running"
 
     def play_turn(self, ui):
-        pass
-
-    def is_running(self):
-        pass
+        '''
+        Show sensory hints based on nearby hazards.
+        Ask if the player wants to move or shoot.
+        Execute that action (by calling the corresponding method).
+        Check if the player died, won, or continues.
+        Return the result ("running", "win", or "lose").
+        '''
 
 # DEBUGGNG
 if __name__ == "__main__":
