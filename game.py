@@ -4,6 +4,8 @@ game.py
 Contains all pure game logic for Wumpus.
 Handles room generation, hazards, movement, and combat.
 Does not perform any input/output — game.py refers to io_cli.py for UI.
+--------
+Theodor Holmberg aka @egeltorp 2025
 """
 
 import random
