@@ -31,13 +31,34 @@ class WumpusGame:
         self.seed = seed
 
     def generate_rooms(self):
-        pass
+        self.rooms = [Room(i) for i in range(self.num_rooms)]
 
     def connect_rooms(self):
-        pass
+        number_of_connections = 4
+
+        # Run this code for each room in self.rooms
+        for room in self.rooms:
+            while len(room.connected_rooms) < number_of_connections:
+                target_room = random.choice(self.rooms)
+                if target_room != room and target_room not in room.connected_rooms:
+                    room.connected_rooms.append(target_room)
+                    target_room.connected_rooms.append(room)
 
     def place_hazards(self):
-        pass
+        # Determine number of rooms with pits and bats
+        number_of_pits = int(self.num_rooms * self.pit_rate)
+        number_of_bats = int(self.num_rooms * self.bat_rate)
+
+        # Place pits in pit rooms using preselected rooms
+        pit_rooms = random.sample(self.rooms, number_of_pits)
+        for room in pit_rooms:
+            room.has_pit = True
+
+        # Place bats in bat rooms making sure pit rooms are ignored
+        empty_rooms = [room for room in self.rooms if not room.has_pit]
+        bat_rooms = random.sample(empty_rooms, number_of_bats)
+        for room in bat_rooms:
+            room.has_bats = True
 
     def place_player(self):
         pass
@@ -75,3 +96,11 @@ if __name__ == "__main__":
     game = WumpusGame()
     game.random_seed(game.seed)
     print(f"Game initialized with seed: {game.seed}")
+
+    game.generate_rooms()
+    print(f"Generated {len(game.rooms)} rooms.")
+
+    game.connect_rooms()
+    for room in game.rooms:
+        connected_ids = [r.room_id for r in room.connected_rooms]
+        print(f"Room {room.room_id} connected to rooms: {connected_ids}")
