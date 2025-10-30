@@ -25,6 +25,7 @@ class TextUI:
             "bat_grab": "A bat grabs your skinny ass and drops you in a random room!",
             "invalid_move": "Not a valid move.",
             "invalid_action": "Not a valid action.",
+            "arrow_shot": "The arrow enters a room."
         }
 
     def show_message(self, key):
@@ -44,11 +45,25 @@ class TextUI:
             lines.append("[bold red]You smell a foul stench, reminding you of Hardox... post-pub![/bold red]")
 
         if lines:
-            self.console.print(Panel("\n".join(lines), title="[bold yellow]Senses[/bold yellow]", border_style="yellow"))
+            panel = Panel("\n".join(lines), title="[bold yellow]Senses[/bold yellow]", border_style="yellow")
+            self.console.print(panel, justify="left")
+    
 
     def ask_action(self):
         # Ask M/S choice
-        pass
+        panel_content = (
+            "[bold]What do you want to do?[/bold]\n"
+            "[cyan][M][/cyan] Move\n"
+            "[cyan][S][/cyan] Shoot an arrow"
+        )
+
+        panel = Panel(panel_content, title="[bold cyan]Your Action[/bold cyan]", border_style="cyan",)
+
+        self.console.print(panel, justify="left")
+
+        action = Prompt.ask("Choose [cyan][M/S][/cyan]", choices=["M", "S"], show_choices=False, case_sensitive=False).upper()
+        print(str(action))
+        return action
 
     def ask_move_room(self):
         # Ask which room to move to
@@ -69,5 +84,6 @@ class TextUI:
 # DEBUGGING
 if __name__ == "__main__":
     t = TextUI()
-    t.show_message("invalid_move")
+    # t.show_message("invalid_move")
     t.show_senses({"pit": True, "bats": True, "wumpus": True})
+    t.ask_action()
