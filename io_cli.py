@@ -31,19 +31,43 @@ class TextUI:
         text = self.messages.get(key)
         self.console.print(f"[bold yellow]{text}[/bold yellow]")
 
+    def display_status(self):
+        pass
+
     def show_senses(self, sense_dict: dict):
         lines = []
         if sense_dict["pit"]:
             lines.append("[blue]You feel a cold breeze.[/blue]")
         if sense_dict["bats"]:
-            lines.append("[#FFA500]You hear the flapping of wings...[/#FFA500]")
+            lines.append("[italic #FFA500]You hear the flapping of wings...[/italic #FFA500]")
         #if sense_dict["wumpus"]:
-            lines.append("[red]You smell a foul stench, reminding you of Hardox... post-pub![/red]")
+            lines.append("[bold red]You smell a foul stench, reminding you of Hardox... post-pub![/bold red]")
 
         if lines:
             self.console.print(Panel("\n".join(lines), title="[bold yellow]Senses[/bold yellow]", border_style="yellow"))
+
+    def ask_action(self):
+        # Ask M/S choice
+        pass
+
+    def ask_move_room(self):
+        # Ask which room to move to
+        pass
+
+    def ask_target_room(self):
+        # Ask which room to shoot into, 3x
+        pass
+
+    def show_welcome(self):
+        # Show welcome screen
+        pass
+
+    def show_end_screen(self, result: str):
+        # Show end screen based on result ("win" or "lose", but stylized nicely)
+        pass
 
 # DEBUGGING
 if __name__ == "__main__":
     t = TextUI()
     t.show_message("invalid_move")
+    t.show_senses({"pit": True, "bats": True, "wumpus": True})
