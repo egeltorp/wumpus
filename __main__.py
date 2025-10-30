@@ -32,16 +32,18 @@ def run_game(ui: TextUI):
     game.place_hazards()
     game.place_player()
 
+    sense_dict = game.sense_environment()
+    ui.show_senses(sense_dict)
     # INTRO
     # intro text
 
     # CORE LOOP
-    while not game.is_over():
+    #while not game.is_over():
         # display status
         # get action
         # do action
         # something like that
-        pass
+        #pass
 
     # WIN
     # ui.display_win()
