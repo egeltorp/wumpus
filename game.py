@@ -40,9 +40,8 @@ class WumpusGame:
         self.safe_rooms = safe_rooms
         self.seed = seed
 
-    def random_seed(self, seed: int):
-        random.seed(seed)
-        self.seed = seed
+    def random_seed(self):
+        random.seed(self.seed)
 
     def generate_rooms(self):
         self.rooms = [Room(i) for i in range(self.num_rooms)]
@@ -124,7 +123,7 @@ class WumpusGame:
         # Check if valid move
         room_id = ui.ask_move_room(self.player.current_room.connected_rooms)
         if room_id in self.player.current_room.connected_rooms:
-            self.player.current_room = room
+            self.player.current_room = room_id
         else:
             ui.show_message("invalid_move")
             return False
@@ -144,18 +143,21 @@ class WumpusGame:
                 ui.show_message("arrow_miss")
                 return False
 
-    def check_pit_kill(self):
+    def check_pit_kill(self, ui):
         if self.player.current_room.has_pit:
+            ui.show_message("pit_fall")
             self.player.is_alive = False
 
-    def check_bats_transport(self) -> bool:
+    def check_bats_transport(self, ui) -> bool:
         if self.player.current_room.has_bats:
             possible_rooms = [room for room in self.safe_rooms if room != self.player.current_room]
+            ui.show_message("bat_grab")
             self.player.current_room = random.choice(possible_rooms)
         return False
     
-    def check_wumpus_encounter(self) -> bool:
+    def check_wumpus_encounter(self, ui) -> bool:
         if self.player.current_room.has_wumpus:
+            ui.show_message("wumpus_attack")
             self.player.is_alive = False
 
     def check_game_state(self):
@@ -193,6 +195,7 @@ class WumpusGame:
 
 
 # DEBUGGNG
+'''
 if __name__ == "__main__":
     game = WumpusGame()
     game.random_seed(game.seed)
@@ -219,3 +222,4 @@ if __name__ == "__main__":
 
     game.place_player()
     print(f"Player is in room {str(game.player.current_room.room_id)} with {game.starting_arrows} arrows.")
+'''
