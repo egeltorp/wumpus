@@ -169,13 +169,26 @@ class WumpusGame:
         return "running"
 
     def play_turn(self, ui):
-        '''
-        Show sensory hints based on nearby hazards.
-        Ask if the player wants to move or shoot.
-        Execute that action (by calling the corresponding method).
-        Check if the player died, won, or continues.
-        Return the result ("running", "win", or "lose").
-        '''
+        sense_dict = self.sense_environment()
+        ui.display_senses(sense_dict)
+
+        ui.display_status(self.player.current_room.room_id, self.player.arrows)
+
+        action = ui.ask_action()
+
+        if action == "M":
+            self.move_player(ui)
+            self.check_pit_kill()
+            self.check_bats_transport()
+            self.check_wumpus_encounter()
+
+        elif action == "S":
+            self.shoot_arrow(ui)
+        else:
+            ui.show_message("invalid_action")
+            
+        return self.check_game_state()
+
 
 # DEBUGGNG
 if __name__ == "__main__":
