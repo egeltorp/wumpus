@@ -1,5 +1,10 @@
-# __main__.py
-# Theodor Holmberg 2025
+'''
+__main__.py
+--------
+Wumpus Game Main Module
+--------
+Theodor Holmberg aka @egeltorp 2025
+'''
 
 from io_cli import TextUI
 from game import WumpusGame
@@ -15,10 +20,13 @@ def run_game(ui: TextUI):
     game = WumpusGame(num_rooms = NUM_ROOMS,
                        pit_rate = PIT_RATE, 
                        bat_rate = BAT_RATE, 
-                       arrows = ARROWS,
+                       starting_arrows = ARROWS,
+                       rooms = [], 
+                       safe_rooms = [],
                        seed = SEED)
     
     # SETUP
+    game.random_seed()
     game.generate_rooms()
     game.connect_rooms()
     game.place_hazards()
