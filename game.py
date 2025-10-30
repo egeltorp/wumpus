@@ -9,21 +9,23 @@ class Room:
         self.has_wumpus = False
 
 class Player:
-    def __init__(self, starting_room: Room, arrows: int):
+    def __init__(self, starting_room: Room, starting_arrows: int):
         self.current_room = starting_room
-        self.arrows = arrows
+        self.arrows = starting_arrows
         self.is_alive = True
 
 class WumpusGame:
     def __init__(self, num_rooms: int = 16, 
                  pit_rate: float = 0.2, 
-                 bat_rate: float = 0.3, 
-                 arrows: int = 5, 
+                 bat_rate: float = 0.3,
+                 starting_arrows: int = 5,
+                 rooms: list = [],
                  seed: int = 1701):
         self.num_rooms = num_rooms
         self.pit_rate = pit_rate
         self.bat_rate = bat_rate
-        self.arrows = arrows
+        self.starting_arrows = starting_arrows
+        self.rooms = rooms
         self.seed = seed
 
     def random_seed(self, seed: int):
@@ -37,19 +39,26 @@ class WumpusGame:
         number_of_connections = 4
         safety_limit = 500
 
-        # BUGGED, sometimes causes a room to only get 2 connections instead of 4
+        # # # BUGGED, sometimes causes a room to only get 2 connections instead of 4
+
         # Run this code for each room in self.rooms
         for room in self.rooms:
             attempts = 0
+
+            # While the room has less than the required connections 
+            # and attempts is less than safety limit
             while len(room.connected_rooms) < number_of_connections and attempts < safety_limit:
                 attempts += 1
                 target_room = random.choice(self.rooms)
+
+                # Check if the target room can be connected
                 if (
                     target_room != room 
                     and target_room not in room.connected_rooms 
                     and len(target_room.connected_rooms) < number_of_connections
                     ):
                     
+                    # Create a two-way connection
                     room.connected_rooms.append(target_room)
                     target_room.connected_rooms.append(room)
 
@@ -75,10 +84,25 @@ class WumpusGame:
         wumpus_room.has_wumpus = True
 
     def place_player(self):
-        pass
+        # Place player in a random empty room
+        empty_rooms = [room for room in self.rooms if not room.has_pit and not room.has_bats and not room.has_wumpus]
+        spawn_room = random.choice(empty_rooms)
+        self.player = Player(spawn_room, self.starting_arrows)
 
     def sense_environment(self):
-        pass
+        # Dictionary for storing sensed hazards
+        sense_dict = {"pit": False, "bats": False, "wumpus": False}
+
+        # Checking nearby rooms for hazards
+        for nearby_room in self.player.current_room.connected_rooms:
+            if nearby_room.has_pit:
+                sense_dict["pit"] = True
+            if nearby_room.has_bats:
+                sense_dict["bats"] = True
+            if nearby_room.has_wumpus:
+                sense_dict["wumpus"] = True
+
+        return sense_dict
     
     def move_player(self, room_id: int):
         pass
@@ -118,3 +142,17 @@ if __name__ == "__main__":
     for room in game.rooms:
         connected_ids = [r.room_id for r in room.connected_rooms]
         print(f"Room {room.room_id} connected to rooms: {connected_ids}")
+
+    game.place_hazards()
+    for room in game.rooms:
+        if room.has_pit:
+            print(f"O Room {room.room_id} has a pit.")
+    for room in game.rooms:
+        if room.has_bats:
+            print(f"X Room {room.room_id} has bats.")
+    for room in game.rooms:
+        if room.has_wumpus:
+            print(f"> Room {room.room_id} has the Wumpus.")
+
+    game.place_player()
+    print(f"Player is in room {str(game.player.current_room.room_id)} with {game.starting_arrows} arrows.")
