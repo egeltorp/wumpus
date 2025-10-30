@@ -20,12 +20,14 @@ class WumpusGame:
                  bat_rate: float = 0.3,
                  starting_arrows: int = 5,
                  rooms: list = [],
+                 safe_rooms: list = [],
                  seed: int = 1701):
         self.num_rooms = num_rooms
         self.pit_rate = pit_rate
         self.bat_rate = bat_rate
         self.starting_arrows = starting_arrows
         self.rooms = rooms
+        self.safe_rooms = safe_rooms
         self.seed = seed
 
     def random_seed(self, seed: int):
@@ -83,10 +85,14 @@ class WumpusGame:
         wumpus_room = random.choice(empty_room)
         wumpus_room.has_wumpus = True
 
+        # Store safe rooms
+        self.safe_rooms = [room for room in self.rooms if not room.has_pit and not room.has_bats and not room.has_wumpus]
+
     def place_player(self):
         # Place player in a random empty room
-        empty_rooms = [room for room in self.rooms if not room.has_pit and not room.has_bats and not room.has_wumpus]
-        spawn_room = random.choice(empty_rooms)
+        spawn_room = random.choice(self.safe_rooms)
+
+        # Creates a Player instance in WumpusGame class
         self.player = Player(spawn_room, self.starting_arrows)
 
     def sense_environment(self):
@@ -104,29 +110,35 @@ class WumpusGame:
 
         return sense_dict
     
-    def move_player(self, room_id: int):
+    def move_player(self, room_id: int) -> bool:
+        # Check if valid move
+        if room_id in self.player.current_room.connected_rooms:
+            self.player.current_room = room
+        else:
+            return False
+
+    def shoot_arrow(self, room_id: int):
         pass
 
-    def shoot_arrow(self, room_id: int) -> bool:
-        pass
+    def pit_kill_player(self) -> bool:
+        if self.player.current_room.has_pit:
+            return True
+        return False
 
-    def bats_transport_player(self):
-        pass
+    def bats_transport_player(self) -> bool:
+        if self.player.current_room.has_bats:
+            possible_rooms = [room for room in self.safe_rooms if room != self.player.current_room]
+            self.player.current_room = random.choice(possible_rooms)
+        return False
 
-    def pit_kill_player(self):
-        pass
-
-    def check_player_win(self) -> bool:
-        # Determine if the player has won
-        # game.is_over() should return True if the game has ended
+    def check_win_lose(self):
+        # Determine if the player has won or lost
         pass
 
     def play_turn(self, ui):
         pass
 
-    def is_running(self) -> bool:
-        # Determine if the game is still running
-        # return NOT self.is_over()
+    def is_running(self):
         pass
 
 # DEBUGGNG
