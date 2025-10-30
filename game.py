@@ -1,3 +1,5 @@
+import random
+
 class Room:
     def __init__(self, room_id: int):
         self.room_id = room_id
@@ -13,11 +15,11 @@ class Player:
         self.is_alive = True
 
 class WumpusGame:
-    def __init__(self, num_rooms = NUM_ROOMS,
-                       pit_rate = PIT_RATE, 
-                       bat_rate = BAT_RATE, 
-                       arrows = ARROWS,
-                       seed = SEED):
+    def __init__(self, num_rooms: int = 16, 
+                 pit_rate: float = 0.2, 
+                 bat_rate: float = 0.3, 
+                 arrows: int = 5, 
+                 seed: int = 1701):
         self.num_rooms = num_rooms
         self.pit_rate = pit_rate
         self.bat_rate = bat_rate
@@ -25,7 +27,8 @@ class WumpusGame:
         self.seed = seed
 
     def random_seed(self, seed: int):
-        pass
+        random.seed(seed)
+        self.seed = seed
 
     def generate_rooms(self):
         pass
@@ -67,3 +70,8 @@ class WumpusGame:
         # return NOT self.is_over()
         pass
 
+# DEBUGGNG
+if __name__ == "__main__":
+    game = WumpusGame()
+    game.random_seed(game.seed)
+    print(f"Game initialized with seed: {game.seed}")
