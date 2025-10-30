@@ -4,9 +4,9 @@ class Room:
     def __init__(self, room_id: int):
         self.room_id = room_id
         self.connected_rooms = []
-        self.has_wumpus = False
         self.has_pit = False
         self.has_bats = False
+        self.has_wumpus = False
 
 class Player:
     def __init__(self, starting_room: Room, arrows: int):
@@ -59,6 +59,11 @@ class WumpusGame:
         bat_rooms = random.sample(empty_rooms, number_of_bats)
         for room in bat_rooms:
             room.has_bats = True
+
+        # Place Wumpus in a random empty room
+        empty_room = [room for room in self.rooms if not room.has_pit and not room.has_bats]
+        wumpus_room = random.choice(empty_room)
+        wumpus_room.has_wumpus = True
 
     def place_player(self):
         pass
