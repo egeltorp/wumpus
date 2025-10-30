@@ -95,7 +95,7 @@ class WumpusGame:
         # Creates a Player instance in WumpusGame class
         self.player = Player(spawn_room, self.starting_arrows)
 
-    def sense_environment(self):
+    def sense_environment(self) -> dict:
         # Dictionary for storing sensed hazards
         sense_dict = {"pit": False, "bats": False, "wumpus": False}
 
@@ -110,15 +110,29 @@ class WumpusGame:
 
         return sense_dict
     
-    def move_player(self, room_id: int) -> bool:
+    def move_player(self, ui) -> bool:
         # Check if valid move
+        room_id = ui.ask_move_room(self.player.current_room.connected_rooms)
         if room_id in self.player.current_room.connected_rooms:
             self.player.current_room = room
         else:
+            ui.show_message("invalid_move")
             return False
 
-    def shoot_arrow(self, room_id: int):
-        pass
+    def shoot_arrow(self, ui):
+        if self.player.arrows <= 0:
+            ui.show_message("no_arrows")
+            return False
+        
+        for i in range(0, 3):
+            target_room = ui.ask_target_room(self.player.current_room.connected_rooms)
+            self.player.arrows -= 1
+            if target_room.has_wumpus:
+                ui.show_message("wumpus_hit")
+                return True
+            else:
+                ui.show_message("arrow_miss")
+                return False
 
     def pit_kill_player(self) -> bool:
         if self.player.current_room.has_pit:
