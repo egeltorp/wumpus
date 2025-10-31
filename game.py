@@ -121,13 +121,13 @@ class WumpusGame:
         return sense_dict
     
     def move_player(self, ui) -> bool:
-        # Check if valid move
-        room_id = ui.ask_move_room(self.player.current_room.connected_rooms)
-        if room_id in self.player.current_room.connected_rooms:
-            self.player.current_room = room_id
-        else:
+        while True:
+            target_room_id = ui.ask_move_room()
+            for room in self.player.current_room.connected_rooms:
+                if room.room_id == target_room_id:
+                    self.player.current_room = target_room_id
+                    return True
             ui.show_message("invalid_move")
-            return False
 
     def shoot_arrow(self, ui):
         if self.player.arrows <= 0:
@@ -175,12 +175,20 @@ class WumpusGame:
         return "running"
     
     def is_over(self) -> bool:
-        state = self.check_game_state()
-        return state in ["win", "lose"]
+        state = self.check_game_state
+        if state == "lose":
+            return True
+        if state == "win":
+            return True
+        elif state == "running":
+            return False
 
     def play_turn(self, ui):
+        # ui.console.clear()
         senses = ui.calculate_senses(self.sense_environment())
-        status = ui.display_status(self.player.current_room.room_id, self.player.arrows) 
+        status = ui.calculate_status(self.player.current_room.room_id, 
+                                     self.player.arrows, 
+                                     self.player.current_room.connected_rooms) 
         ui.show_panels(senses, status)
 
         action = ui.ask_action()
@@ -188,9 +196,9 @@ class WumpusGame:
         if action == "M":
             self.move_player(ui)
             # automatic checks after moving
-            self.check_pit_kill()
-            self.check_bats_transport()
-            self.check_wumpus_encounter()
+            self.check_pit_kill(ui)
+            self.check_bats_transport(ui)
+            self.check_wumpus_encounter(ui)
 
         elif action == "S":
             self.shoot_arrow(ui)

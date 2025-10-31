@@ -33,38 +33,46 @@ class TextUI:
         text = self.messages.get(key)
         self.console.print(f"[bold yellow]{text}[/bold yellow]")
 
-    def display_status(self):
-        pass
-
     def calculate_senses(self, sense_dict: dict) -> Panel:
         lines = []
         if sense_dict["pit"]:
-            lines.append("[blue]You feel a cold breeze.[/blue]")
+            lines.append("You feel a [bold blue]cold breeze.[/bold blue]")
         if sense_dict["bats"]:
-            lines.append("[italic #FFA500]You hear the flapping of wings...[/italic #FFA500]")
+            lines.append("You hear the [italic]flapping of wings...[/italic]")
         if sense_dict["wumpus"]:
-            lines.append("[bold red]You smell a foul stench, reminding you of Hardox... post-pub![/bold red]")
+            lines.append("You smell a [bold red]foul stench[/bold red], reminding you of Hardox!")
 
         if lines:
             panel = Panel("\n".join(lines), title="[bold yellow]Senses[/bold yellow]", border_style="yellow")
             return panel
+        
+    def calculate_status(self, current_room_id: int, arrows: int, nearby_rooms: list) -> Panel:
+        lines = []
+        room_ids = [r.room_id for r in nearby_rooms]
+
+        lines.append(f"You are in room [bold magenta]{current_room_id}[/bold magenta].")
+        lines.append(f"You have [bold magenta]{arrows}[/bold magenta] arrows left.")
+        lines.append(f"Nearby rooms: [bold magenta]{room_ids}[/bold magenta]")
+        status_panel = Panel("\n".join(lines), title="[bold magenta]Status[/bold magenta]", border_style="magenta")
+        return status_panel
 
     def ask_action(self):
-        input_text = Text("Enter your action (M/S): ", style="bold cyan")
+        input_text = Text("Enter your action (M/S): ", style="bold green")
         action = self.console.input(input_text).strip().upper()      
         return action
 
-    def ask_move_room(self):
-        # Ask which room to move to
-        pass
+    def ask_move_room(self) -> int:
+        input_text = Text("Room to enter: ", style="bold green")
+        input = int(self.console.input(input_text).strip())
+        return input
 
-    def ask_target_room(self):
-        # Ask which room to shoot into, 3x
-        pass
+    def ask_target_room(self) -> int:
+        input_text = Text("Which room do you want to shoot into? : ", style="bold red")
+        target_room_id = int(self.console.input(input_text).strip().upper())
+        return target_room_id
 
     def show_welcome(self):
-        # Show welcome screen
-        pass
+        print("Welcome to Wumpus!")
 
     def show_result(self, result: str):
         # Show win/lose result
@@ -73,8 +81,8 @@ class TextUI:
         elif result == "lose":
             self.console.print("[bold red]Ouch! You met a grim and quite frankly embarassing fate. Better luck next time bozo![/bold red]")
 
-    def show_panels(self, senses_panel: Panel):
-        # Combine all panels side by side
+    def show_panels(self, senses_panel: Panel, status_panel: Panel):
+        # Shows actions, senses, and status panels
 
         # Actions panel
         actions_panel_content = (
@@ -84,12 +92,8 @@ class TextUI:
         )
         actions_panel = Panel(actions_panel_content, title="[bold cyan]Your Action[/bold cyan]", border_style="cyan",)
 
-        self.console.print(Columns([actions_panel, senses_panel], equal=True))
+        self.console.print(Columns([actions_panel, status_panel, senses_panel], equal=True))
 
 # DEBUGGING
 if __name__ == "__main__":
-    t = TextUI()
-
-    sense_dict = {"pit": True, "bats": True, "wumpus": True}
-    t.show_panels(t.calculate_senses(sense_dict))
-    t.ask_action()
+    pass

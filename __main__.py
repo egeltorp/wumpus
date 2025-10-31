@@ -16,15 +16,7 @@ BAT_RATE = 0.3
 ARROWS = 5
 SEED = 1701
 
-def run_game(ui: TextUI):
-    game = WumpusGame(num_rooms = NUM_ROOMS,
-                       pit_rate = PIT_RATE, 
-                       bat_rate = BAT_RATE, 
-                       starting_arrows = ARROWS,
-                       rooms = [], 
-                       safe_rooms = [],
-                       seed = SEED)
-    
+def run_game_cli(ui: TextUI, game: WumpusGame):
     # SETUP
     game.random_seed()
     game.generate_rooms()
@@ -35,9 +27,10 @@ def run_game(ui: TextUI):
     ui.show_welcome()
 
     while not game.is_over():
+        print("Starting turn")
         game.play_turn(ui)
         game.check_game_state()
-
+    
     if game.check_game_state() == "win":
         ui.show_result("win")
     if game.check_game_state() == "lose":
@@ -45,7 +38,14 @@ def run_game(ui: TextUI):
 
 def main():
     ui = TextUI()
-    run_game(ui)
+    game = WumpusGame(num_rooms = NUM_ROOMS,
+                    pit_rate = PIT_RATE, 
+                    bat_rate = BAT_RATE, 
+                    starting_arrows = ARROWS,
+                    rooms = [], 
+                    safe_rooms = [],
+                    seed = SEED)
+    run_game_cli(ui, game)
 
 if __name__ == "__main__":
     main()
