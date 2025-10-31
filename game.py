@@ -168,17 +168,17 @@ class WumpusGame:
             return "lose"
         
         # if Wumpus is dead, player wins
-        if any(room.has_wumpus == False for room in self.rooms):
+        if not any(room.has_wumpus for room in self.rooms):
             return "win"
         
         # otherwise, game continues
         return "running"
     
     def is_over(self) -> bool:
-        state = self.check_game_state
+        state = self.check_game_state()
         if state == "lose":
             return True
-        if state == "win":
+        elif state == "win":
             return True
         elif state == "running":
             return False
