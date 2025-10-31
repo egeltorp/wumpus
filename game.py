@@ -125,7 +125,7 @@ class WumpusGame:
             target_room_id = ui.ask_move_room()
             for room in self.player.current_room.connected_rooms:
                 if room.room_id == target_room_id:
-                    self.player.current_room = target_room_id
+                    self.player.current_room = room
                     return True
             ui.show_message("invalid_move")
 
