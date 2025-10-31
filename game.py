@@ -191,7 +191,12 @@ class WumpusGame:
                                      self.player.current_room.connected_rooms) 
         ui.show_panels(senses, status)
 
-        action = ui.ask_action()
+        while True:
+            action = ui.ask_action()
+            if action in ("M", "S"):
+                break
+            else:
+                ui.show_message("invalid_action")
 
         if action == "M":
             self.move_player(ui)

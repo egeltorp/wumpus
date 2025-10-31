@@ -49,10 +49,11 @@ class TextUI:
     def calculate_status(self, current_room_id: int, arrows: int, nearby_rooms: list) -> Panel:
         lines = []
         room_ids = [r.room_id for r in nearby_rooms]
+        rooms = ", ".join(str(id) for id in room_ids)
 
         lines.append(f"You are in room [bold magenta]{current_room_id}[/bold magenta].")
         lines.append(f"You have [bold magenta]{arrows}[/bold magenta] arrows left.")
-        lines.append(f"Nearby rooms: [bold magenta]{room_ids}[/bold magenta]")
+        lines.append(f"Nearby rooms: [bold magenta]{rooms}[/bold magenta]")
         status_panel = Panel("\n".join(lines), title="[bold magenta]Status[/bold magenta]", border_style="magenta")
         return status_panel
 

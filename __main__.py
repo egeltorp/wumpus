@@ -27,7 +27,6 @@ def run_game_cli(ui: TextUI, game: WumpusGame):
     ui.show_welcome()
 
     while not game.is_over():
-        print("Starting turn")
         game.play_turn(ui)
         game.check_game_state()
     
