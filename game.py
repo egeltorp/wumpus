@@ -122,7 +122,7 @@ class WumpusGame:
     
     def move_player(self, ui) -> bool:
         while True:
-            target_room_id = ui.ask_move_room()
+            target_room_id = ui.ask_move_room(self.player.current_room.room_id)
             for room in self.player.current_room.connected_rooms:
                 if room.room_id == target_room_id:
                     self.player.current_room = room

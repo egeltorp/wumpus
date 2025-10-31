@@ -14,6 +14,7 @@ from rich.text import Text
 from rich.prompt import Prompt
 from rich.panel import Panel
 from rich.columns import Columns
+from rich.align import Align
 
 class TextUI:
     def __init__(self):
@@ -21,8 +22,8 @@ class TextUI:
         
         self.messages = {
             "no_arrows": "You have no arrows left!",
-            "wumpus_attack": "The Wumpus gorges on your flesh! You have been gobbled to death!",
-            "pit_fall": "You tripped like a bitch and fell into a pit! Game over!",
+            "wumpus_attack": "The Wumpus slobbers on your flesh!",
+            "pit_fall": "You tripped into a pit like a bitch...",
             "bat_grab": "A bat grabs your skinny ass and drops you in a random room!",
             "invalid_move": "Not a valid move.",
             "invalid_action": "Not a valid action.",
@@ -42,6 +43,9 @@ class TextUI:
         if sense_dict["wumpus"]:
             lines.append("You smell a [bold red]foul stench[/bold red], reminding you of Hardox!")
 
+        if lines == []:
+            lines.append("Nothing special...")
+
         if lines:
             panel = Panel("\n".join(lines), title="[bold yellow]Senses[/bold yellow]", border_style="yellow")
             return panel
@@ -52,7 +56,7 @@ class TextUI:
         rooms = ", ".join(str(id) for id in room_ids)
 
         lines.append(f"You are in room [bold magenta]{current_room_id}[/bold magenta].")
-        lines.append(f"You have [bold magenta]{arrows}[/bold magenta] arrows left.")
+        lines.append(f"You have [bold red]{arrows}[/bold red] arrows left.")
         lines.append(f"Nearby rooms: [bold magenta]{rooms}[/bold magenta]")
         status_panel = Panel("\n".join(lines), title="[bold magenta]Status[/bold magenta]", border_style="magenta")
         return status_panel
@@ -62,8 +66,9 @@ class TextUI:
         action = self.console.input(input_text).strip().upper()      
         return action
 
-    def ask_move_room(self) -> int:
-        input_text = Text("Room to enter: ", style="bold green")
+    def ask_move_room(self, room_id) -> int:
+        self.console.print(f"You are in room [bold magenta]{room_id}[/bold magenta].")
+        input_text = Text("Room to enter: ", style="bold magenta")
         input = int(self.console.input(input_text).strip())
         return input
 
@@ -73,7 +78,15 @@ class TextUI:
         return target_room_id
 
     def show_welcome(self):
-        print("Welcome to Wumpus!")
+        title = Text("WUMPUS", style="bold red on black", justify="center")
+        subtitle = Text("Beneath Hardox... he waits.")
+        panel = Panel(
+            Align.center(Text.assemble(title, "\n", subtitle)),
+            border_style="red",
+            padding=(1, 4),
+            title="[bold bright_red]* * *[/bold bright_red]"
+        )
+        self.console.print(panel)
 
     def show_result(self, result: str):
         # Show win/lose result
@@ -88,10 +101,10 @@ class TextUI:
         # Actions panel
         actions_panel_content = (
             "[bold]What do you want to do?[/bold]\n"
-            "[bold white][M][/bold white] Move\n"
-            "[bold white][S][/bold white] Shoot an arrow"
+            "[bold magenta][M][/bold magenta] Move\n"
+            "[bold red][S][/bold red] Shoot an arrow"
         )
-        actions_panel = Panel(actions_panel_content, title="[bold cyan]Your Action[/bold cyan]", border_style="cyan",)
+        actions_panel = Panel(actions_panel_content, title="[bold white]Your Action[/bold white]", border_style="white",)
 
         self.console.print(Columns([actions_panel, status_panel, senses_panel], equal=True))
 

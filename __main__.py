@@ -8,6 +8,7 @@ Theodor Holmberg aka @egeltorp 2025
 
 from io_cli import TextUI
 from game import WumpusGame
+import time
 
 # PARAMETERS
 NUM_ROOMS = 16
@@ -25,6 +26,7 @@ def run_game_cli(ui: TextUI, game: WumpusGame):
     game.place_player()
 
     ui.show_welcome()
+    time.sleep(2)
 
     while not game.is_over():
         game.play_turn(ui)
