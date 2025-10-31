@@ -39,6 +39,7 @@ class WumpusGame:
         self.rooms = rooms
         self.safe_rooms = safe_rooms
         self.seed = seed
+        self.state = "running"
 
     def random_seed(self):
         random.seed(self.seed)
@@ -134,8 +135,9 @@ class WumpusGame:
             return False
         
         for i in range(0, 3):
-            target_room = ui.ask_target_room(self.player.current_room.connected_rooms)
+            target_room = ui.ask_target_room(self.player.current_room.connected_rooms) # a room_id
             self.player.arrows -= 1
+            ui.show_message("arrow_shot")
             if target_room.has_wumpus:
                 ui.show_message("wumpus_hit")
                 return True
@@ -160,7 +162,7 @@ class WumpusGame:
             ui.show_message("wumpus_attack")
             self.player.is_alive = False
 
-    def check_game_state(self):
+    def check_game_state(self) -> str:
         # if player is dead, they lose
         if not self.player.is_alive:
             return "lose"
@@ -171,17 +173,21 @@ class WumpusGame:
         
         # otherwise, game continues
         return "running"
+    
+    def is_over(self) -> bool:
+        state = self.check_game_state()
+        return state in ["win", "lose"]
 
     def play_turn(self, ui):
-        sense_dict = self.sense_environment()
-        ui.display_senses(sense_dict)
-
-        ui.display_status(self.player.current_room.room_id, self.player.arrows)
+        senses = ui.calculate_senses(self.sense_environment())
+        status = ui.display_status(self.player.current_room.room_id, self.player.arrows) 
+        ui.show_panels(senses, status)
 
         action = ui.ask_action()
 
         if action == "M":
             self.move_player(ui)
+            # automatic checks after moving
             self.check_pit_kill()
             self.check_bats_transport()
             self.check_wumpus_encounter()
@@ -190,36 +196,3 @@ class WumpusGame:
             self.shoot_arrow(ui)
         else:
             ui.show_message("invalid_action")
-            
-        return self.check_game_state()
-
-
-# DEBUGGNG
-'''
-if __name__ == "__main__":
-    game = WumpusGame()
-    game.random_seed(game.seed)
-    print(f"Game initialized with seed: {game.seed}")
-
-    game.generate_rooms()
-    print(f"Generated {len(game.rooms)} rooms.")
-
-    game.connect_rooms()
-    for room in game.rooms:
-        connected_ids = [r.room_id for r in room.connected_rooms]
-        print(f"Room {room.room_id} connected to rooms: {connected_ids}")
-
-    game.place_hazards()
-    for room in game.rooms:
-        if room.has_pit:
-            print(f"O Room {room.room_id} has a pit.")
-    for room in game.rooms:
-        if room.has_bats:
-            print(f"X Room {room.room_id} has bats.")
-    for room in game.rooms:
-        if room.has_wumpus:
-            print(f"> Room {room.room_id} has the Wumpus.")
-
-    game.place_player()
-    print(f"Player is in room {str(game.player.current_room.room_id)} with {game.starting_arrows} arrows.")
-'''
