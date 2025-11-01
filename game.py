@@ -121,13 +121,17 @@ class WumpusGame:
         return sense_dict
     
     def move_player(self, ui) -> bool:
+        direction_to_index = {"N": 0, "E": 1, "S": 2, "W": 3}
+        connected_rooms = self.player.current_room.connected_rooms
+
         while True:
-            target_room_id = ui.ask_move_room(self.player.current_room.room_id)
-            for room in self.player.current_room.connected_rooms:
-                if room.room_id == target_room_id:
-                    self.player.current_room = room
-                    return True
-            ui.show_message("invalid_move")
+            direction = ui.ask_move_room(self.player.current_room.room_id) # returns N,E,S,W string
+            if direction in direction_to_index:
+                target_room_obj = connected_rooms[direction_to_index[direction]]
+                self.player.current_room = target_room_obj
+                return True
+            else:
+                ui.show_message("invalid_move")
 
     def shoot_arrow(self, ui):
         if self.player.arrows <= 0:
@@ -153,7 +157,7 @@ class WumpusGame:
     def check_bats_transport(self, ui) -> bool:
         if self.player.current_room.has_bats:
             possible_rooms = [room for room in self.safe_rooms if room != self.player.current_room]
-            ui.show_message("bat_grab")
+            ui.bat_grab_message(self.player.current_room.room_id)
             self.player.current_room = random.choice(possible_rooms)
         return False
     

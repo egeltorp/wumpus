@@ -26,7 +26,6 @@ class TextUI:
             "no_arrows": "You have no arrows left!",
             "wumpus_attack": "The Wumpus slobbers on your flesh!",
             "pit_fall": "You tripped into a pit like a bitch...",
-            "bat_grab": "A bat grabs your skinny ass and drops you in a random room!",
             "invalid_move": "Not a valid move.",
             "invalid_action": "Not a valid action.",
             "arrow_shot": "The arrow enters a room."
@@ -55,11 +54,14 @@ class TextUI:
     def calculate_status(self, current_room_id: int, arrows: int, nearby_rooms: list) -> Panel:
         lines = []
         room_ids = [r.room_id for r in nearby_rooms]
-        rooms = ", ".join(str(id) for id in room_ids)
+        # rooms = ", ".join(str(id) for id in room_ids)
+        rooms_formatted = "  ".join(f"{r:>2}" for r in room_ids)
+        directions = "   N   E   S   W"
 
-        lines.append(f"You are in room [bold magenta]{current_room_id}[/bold magenta].")
+        lines.append(f"[bold]You are in room [magenta]{current_room_id}[/magenta].[/bold]")
         lines.append(f"You have [bold red]{arrows}[/bold red] arrows left.")
-        lines.append(f"Nearby rooms: [bold magenta]{rooms}[/bold magenta]")
+        lines.append(f"Nearby rooms: [bold magenta]{rooms_formatted}[/bold magenta]")
+        lines.append(f"Directions: [bold magenta]{directions}[/bold magenta]")
         status_panel = Panel("\n".join(lines), title="[bold magenta]STATUS[/bold magenta]", border_style="magenta")
         return status_panel
 
@@ -70,14 +72,19 @@ class TextUI:
 
     def ask_move_room(self, room_id) -> int:
         self.console.print(f"You are in room [bold magenta]{room_id}[/bold magenta].")
-        input_text = Text("Room to enter: ", style="bold magenta")
-        input = int(self.console.input(input_text).strip())
+        directions = f"[bold magenta][N/E/S/W][/bold magenta]"
+        input_text = Text.from_markup(f"[bold magenta]Direction[/bold magenta] to move in {directions}: ")
+        input = str(self.console.input(input_text).upper().strip())
         return input
 
     def ask_target_room(self) -> int:
         input_text = Text("Which room do you want to shoot into? : ", style="bold red")
         target_room_id = int(self.console.input(input_text).strip().upper())
         return target_room_id
+    
+    def bat_grab_message(self, new_room_id):
+        text = f"A bat grabs you... and drops you in Room {new_room_id}!"
+        self.console.print(f"[bold italic yellow]{text}[/bold italic yellow]")
 
     def show_welcome(self):
         # Title panel
@@ -97,6 +104,9 @@ class TextUI:
         prompt = Text.from_markup(f"Skip intro? [{yes}/{no}]: ", style="bold")
         skip = self.console.input(prompt).strip().upper()
         if skip == "Y":
+            sys.stdout.write("\033[F")
+            sys.stdout.write("\033[K")
+            sys.stdout.flush()
             return
 
         # Intro text
@@ -133,7 +143,6 @@ class TextUI:
             print()
             time.sleep(0.5)
 
-
     def show_result(self, result: str):
         # Show win/lose result
         if result == "win":
@@ -149,6 +158,7 @@ class TextUI:
         # Actions panel
         actions_panel_content = (
             "[bold]What do you want to do?[/bold]\n"
+            "\n"
             "[bold magenta][M][/bold magenta] Move\n"
             "[bold red][S][/bold red] Shoot an arrow"
         )
