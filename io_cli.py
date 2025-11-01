@@ -25,10 +25,10 @@ class TextUI:
         self.messages = {
             "no_arrows": "You have no arrows left!",
             "wumpus_attack": "The Wumpus slobbers on your flesh!",
+            "wumpus_hit": "The Wumpus has been struck!",
             "pit_fall": "You tripped into a pit like a bitch...",
             "invalid_move": "Not a valid move.",
             "invalid_action": "Not a valid action.",
-            "arrow_shot": "The arrow enters a room."
         }
 
     def show_message(self, key):
@@ -68,21 +68,23 @@ class TextUI:
     def ask_action(self):
         input_text = Text.from_markup("> Move or Shoot ([magenta]M[/magenta]/[red]S[/red]): ", style="bold white")
         action = self.console.input(input_text).strip().upper()
-        self.clear_prompt()    
+        self.clear_prompt("prompt")    
         return action
 
-    def ask_move_room(self, room_id) -> int:
+    def ask_move_direction(self, room_id) -> str:
         self.console.print(f"You are currently in room [bold magenta]{room_id}[/bold magenta].")
         directions = f"[bold magenta][N/E/S/W][/bold magenta]"
-        input_text = Text.from_markup(f"[bold magenta]Direction[/bold magenta] to move in {directions}: ")
+        input_text = Text.from_markup(f"> {directions} Direction: ", style="bold white")
         input = str(self.console.input(input_text).upper().strip())
         return input
     
     def show_move_transition(self, new_room_id, move_or_bat: str):
+        # if it's a bat transport
         if move_or_bat == "bat":
             self.console.print("A bat grabs you!", end="", style="bold italic yellow")
             print()
 
+        # print dots for "movement"
         for _ in range(3):
             time.sleep(0.3)
             print(".", end="")
@@ -91,15 +93,24 @@ class TextUI:
         self.console.print(f"You are now in room [bold magenta]{new_room_id}[/bold magenta]\n", style="bold white")
         time.sleep(0.5)
 
-    def ask_shoot_room(self) -> int:
-        input_text = Text("Which room do you want to shoot into? : ", style="bold red")
-        target_room_id = int(self.console.input(input_text).strip().upper())
-        return target_room_id
+    def ask_shoot_direction(self) -> str:
+        directions = f"[bold red][N/E/S/W][/bold red]"
+        input_text = Text.from_markup(f"> {directions} Direction: ", style="bold white")
+        input = str(self.console.input(input_text).upper().strip())
+        return input
+    
+    def shooting_text(self, room_number: int):
+        arrow = "[bold red]arrow[/bold red]"
+        if room_number == 1:
+            self.console.print(f"The {arrow} enters the first room.")
+        if room_number == 2:
+            self.console.print(f"The {arrow} enters the seconds room.")
+        if room_number == 3:
+            self.console.print(f"The {arrow} enters the third room.")
     
     def bat_grab_message(self, new_room_id):
         text = f"A bat grabs you... and drops you in Room {new_room_id}!"
         
-
     def show_welcome(self):
         # Title panel
         title = Text("WUMPUS", style="bold red on black", justify="center")
@@ -118,7 +129,7 @@ class TextUI:
         prompt = Text.from_markup(f"> SKIP INTRO? [{yes}/{no}]: ", style="bold white")
         skip = self.console.input(prompt).strip().upper()
         if skip == "Y":
-            self.clear_prompt()
+            self.clear_prompt("prompt")
             return
 
         # Intro text
@@ -178,10 +189,11 @@ class TextUI:
 
         self.console.print(Columns([actions_panel, status_panel, senses_panel], equal=True))
 
-    def clear_prompt(self):
-        sys.stdout.write("\033[F")
-        sys.stdout.write("\033[K")
-        sys.stdout.flush()
+    def clear_prompt(self, to_clear: str):
+        if to_clear == "prompt":
+            sys.stdout.write("\033[F")
+            sys.stdout.write("\033[K")
+            sys.stdout.flush()
 
 # DEBUGGING
 if __name__ == "__main__":

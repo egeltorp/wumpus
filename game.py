@@ -100,7 +100,17 @@ class WumpusGame:
 
     def place_player(self):
         # Place player in a random empty room
-        spawn_room = random.choice(self.safe_rooms)
+        # spawn_room = random.choice(self.safe_rooms)
+
+        # debugging with spawning in room 39
+        # M -> N to 21
+        # M -> S to 25
+        # S -> Shoot room 8 
+        spawn_room = None
+        for room in self.safe_rooms:
+            if room.room_id == 39:
+                spawn_room = room
+                break
 
         # Creates a Player instance in WumpusGame class
         self.player = Player(spawn_room, self.starting_arrows)
@@ -125,7 +135,7 @@ class WumpusGame:
         connected_rooms = self.player.current_room.connected_rooms
 
         while True:
-            direction = ui.ask_move_room(self.player.current_room.room_id) # returns N,E,S,W string
+            direction = ui.ask_move_direction(self.player.current_room.room_id) # returns N,E,S,W string
             if direction in direction_to_index:
                 target_room_obj = connected_rooms[direction_to_index[direction]]
                 self.player.current_room = target_room_obj
@@ -135,20 +145,27 @@ class WumpusGame:
                 ui.show_message("invalid_move")
 
     def shoot_arrow(self, ui):
+        self.player.arrows -= 1
+        direction_to_index = {"N": 0, "E": 1, "S": 2, "W": 3}
+
         if self.player.arrows <= 0:
             ui.show_message("no_arrows")
             return False
         
         for i in range(0, 3):
-            target_room = ui.ask_shoot_room(self.player.current_room.connected_rooms) # returns a target room obj
-            self.player.arrows -= 1
-            ui.show_message("arrow_shot")
-            if target_room.has_wumpus:
+            current_arrow_room = self.player.current_room
+            while True:
+                connected_rooms = self.player.current_room.connected_rooms
+                direction = ui.ask_shoot_direction() # returns N,E,S,W string
+                if direction in direction_to_index:
+                    current_arrow_room = connected_rooms[direction_to_index[direction]]
+                    break
+            ui.shooting_text(i + 1)
+            if current_arrow_room.has_wumpus:
                 ui.show_message("wumpus_hit")
-                return True
-            else:
-                ui.show_message("arrow_miss")
-                return False
+                current_arrow_room.has_wumpus = False
+                return
+        print("The arrow lost its momentum and stopped.")
 
     def check_pit_kill(self, ui):
         if self.player.current_room.has_pit:
@@ -171,6 +188,8 @@ class WumpusGame:
     def check_game_state(self) -> str:
         # if player is dead, they lose
         if not self.player.is_alive:
+            return "lose"
+        elif self.player.arrows <= 0:
             return "lose"
         
         # if Wumpus is dead, player wins
