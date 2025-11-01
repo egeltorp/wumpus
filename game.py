@@ -162,7 +162,6 @@ class WumpusGame:
                     break
             ui.shooting_text(i + 1)
             if current_arrow_room.has_wumpus:
-                ui.show_message("wumpus_hit")
                 current_arrow_room.has_wumpus = False
                 return
             if current_arrow_room.room_id == self.player.current_room.room_id:
