@@ -91,10 +91,11 @@ class TextUI:
         )
         self.console.print(panel)
 
+        # Skip intro prompt
         yes = "[green]Y[/green]"
         no = "[red]N[/red]"
-        skip_text = Text.from_markup(f"Skip intro? [{yes}/{no}]: ", style="bold")
-        skip = self.console.input(skip_text).strip().upper()
+        prompt = Text.from_markup(f"Skip intro? [{yes}/{no}]: ", style="bold")
+        skip = self.console.input(prompt).strip().upper()
         if skip == "Y":
             return
 
@@ -126,11 +127,11 @@ class TextUI:
 
         for line in lines:
             for char in line:
-                self.console.print(char, end="", style="bold white", justify="center")
+                print(char, end="")
                 sys.stdout.flush()
-                time.sleep(0.01)
-            self.console.print()
-            time.sleep(0.3)
+                time.sleep(0.03)
+            print()
+            time.sleep(0.5)
 
 
     def show_result(self, result: str):
