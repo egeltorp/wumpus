@@ -9,7 +9,6 @@ Theodor Holmberg aka @egeltorp 2025
 from io_cli import TextUI
 # from io_gui import GUI
 from game import WumpusGame
-import time
 
 # PARAMETERS
 NUM_ROOMS = 40  # no. of rooms
