@@ -50,7 +50,12 @@ def main():
                     rooms = [], 
                     safe_rooms = [],
                     seed = SEED)
-    run_game(ui, game)
+    while True:
+        run_game(ui, game)
+        answer = ui.console.input("[bold white]Play again? [[green]Y[/green]/[red]N[/red]]: [/bold white]").strip().upper()
+        if answer != "Y":
+            ui.console.print("[bold red]Goodbye![/bold red]")
+            break
 
 if __name__ == "__main__":
     main()
