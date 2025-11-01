@@ -54,19 +54,19 @@ class TextUI:
     def calculate_status(self, current_room_id: int, arrows: int, nearby_rooms: list) -> Panel:
         lines = []
         room_ids = [r.room_id for r in nearby_rooms]
-        # rooms = ", ".join(str(id) for id in room_ids)
         rooms_formatted = "  ".join(f"{r:>2}" for r in room_ids)
-        directions = "   N   E   S   W"
+        directions = "   N   E   S   W" # spaces for formatting under room_ids
 
-        lines.append(f"[bold]You are in room [magenta]{current_room_id}[/magenta].[/bold]")
-        lines.append(f"You have [bold red]{arrows}[/bold red] arrows left.")
+        lines.append(f"[bold white]You are in room [magenta]{current_room_id}[/magenta].[/bold white]")
+        lines.append(f"You have [bold red]{arrows} arrows[/bold red] left.")
         lines.append(f"Nearby rooms: [bold magenta]{rooms_formatted}[/bold magenta]")
         lines.append(f"Directions: [bold magenta]{directions}[/bold magenta]")
+
         status_panel = Panel("\n".join(lines), title="[bold magenta]STATUS[/bold magenta]", border_style="magenta")
         return status_panel
 
     def ask_action(self):
-        input_text = Text.from_markup("Enter your action ([magenta]M[/magenta]/[red]S[/red]): ", style="bold")
+        input_text = Text.from_markup("> Move or Shoot ([magenta]M[/magenta]/[red]S[/red]): ", style="bold white")
         action = self.console.input(input_text).strip().upper()      
         return action
 
@@ -76,8 +76,17 @@ class TextUI:
         input_text = Text.from_markup(f"[bold magenta]Direction[/bold magenta] to move in {directions}: ")
         input = str(self.console.input(input_text).upper().strip())
         return input
+    
+    def show_move_transition(self, new_room_id):
+        print("Moving in the new direction..", end="")
+        for _ in range(4):
+            time.sleep(0.3)
+            print(".", end="")
+            print()
+        time.sleep(0.3)
+        self.console.print(f"You enter room [bold magenta]{new_room_id}[/bold magenta]\n", style="bold white")
 
-    def ask_target_room(self) -> int:
+    def ask_shoot_room(self) -> int:
         input_text = Text("Which room do you want to shoot into? : ", style="bold red")
         target_room_id = int(self.console.input(input_text).strip().upper())
         return target_room_id
@@ -89,7 +98,7 @@ class TextUI:
     def show_welcome(self):
         # Title panel
         title = Text("WUMPUS", style="bold red on black", justify="center")
-        subtitle = Text("Beneath Hardox... he waits.")
+        subtitle = Text("*** Beneath Hardox... he looms. ***", style="white on black")
         panel = Panel(
             Align.center(Text.assemble(title, "\n", subtitle)),
             border_style="red",
@@ -101,7 +110,7 @@ class TextUI:
         # Skip intro prompt
         yes = "[green]Y[/green]"
         no = "[red]N[/red]"
-        prompt = Text.from_markup(f"Skip intro? [{yes}/{no}]: ", style="bold")
+        prompt = Text.from_markup(f"> SKIP INTRO? [{yes}/{no}]: ", style="bold white")
         skip = self.console.input(prompt).strip().upper()
         if skip == "Y":
             sys.stdout.write("\033[F")
@@ -157,12 +166,12 @@ class TextUI:
 
         # Actions panel
         actions_panel_content = (
-            "[bold]What do you want to do?[/bold]\n"
+            "[bold white]What do you want to do?[/bold white]\n"
             "\n"
             "[bold magenta][M][/bold magenta] Move\n"
             "[bold red][S][/bold red] Shoot an arrow"
         )
-        actions_panel = Panel(actions_panel_content, title="[bold white]Your Action[/bold white]", border_style="white",)
+        actions_panel = Panel(actions_panel_content, title="[bold white]ACTION[/bold white]", border_style="white",)
 
         self.console.print(Columns([actions_panel, status_panel, senses_panel], equal=True))
 
