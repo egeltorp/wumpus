@@ -67,24 +67,29 @@ class TextUI:
 
     def ask_action(self):
         input_text = Text.from_markup("> Move or Shoot ([magenta]M[/magenta]/[red]S[/red]): ", style="bold white")
-        action = self.console.input(input_text).strip().upper()      
+        action = self.console.input(input_text).strip().upper()
+        self.clear_prompt()    
         return action
 
     def ask_move_room(self, room_id) -> int:
-        self.console.print(f"You are in room [bold magenta]{room_id}[/bold magenta].")
+        self.console.print(f"You are currently in room [bold magenta]{room_id}[/bold magenta].")
         directions = f"[bold magenta][N/E/S/W][/bold magenta]"
         input_text = Text.from_markup(f"[bold magenta]Direction[/bold magenta] to move in {directions}: ")
         input = str(self.console.input(input_text).upper().strip())
         return input
     
-    def show_move_transition(self, new_room_id):
-        print("Moving in the new direction..", end="")
-        for _ in range(4):
+    def show_move_transition(self, new_room_id, move_or_bat: str):
+        if move_or_bat == "bat":
+            self.console.print("A bat grabs you!", end="", style="bold italic yellow")
+            print()
+
+        for _ in range(3):
             time.sleep(0.3)
             print(".", end="")
             print()
         time.sleep(0.3)
-        self.console.print(f"You enter room [bold magenta]{new_room_id}[/bold magenta]\n", style="bold white")
+        self.console.print(f"You are now in room [bold magenta]{new_room_id}[/bold magenta]\n", style="bold white")
+        time.sleep(0.5)
 
     def ask_shoot_room(self) -> int:
         input_text = Text("Which room do you want to shoot into? : ", style="bold red")
@@ -93,7 +98,7 @@ class TextUI:
     
     def bat_grab_message(self, new_room_id):
         text = f"A bat grabs you... and drops you in Room {new_room_id}!"
-        self.console.print(f"[bold italic yellow]{text}[/bold italic yellow]")
+        
 
     def show_welcome(self):
         # Title panel
@@ -113,9 +118,7 @@ class TextUI:
         prompt = Text.from_markup(f"> SKIP INTRO? [{yes}/{no}]: ", style="bold white")
         skip = self.console.input(prompt).strip().upper()
         if skip == "Y":
-            sys.stdout.write("\033[F")
-            sys.stdout.write("\033[K")
-            sys.stdout.flush()
+            self.clear_prompt()
             return
 
         # Intro text
@@ -174,6 +177,11 @@ class TextUI:
         actions_panel = Panel(actions_panel_content, title="[bold white]ACTION[/bold white]", border_style="white",)
 
         self.console.print(Columns([actions_panel, status_panel, senses_panel], equal=True))
+
+    def clear_prompt(self):
+        sys.stdout.write("\033[F")
+        sys.stdout.write("\033[K")
+        sys.stdout.flush()
 
 # DEBUGGING
 if __name__ == "__main__":

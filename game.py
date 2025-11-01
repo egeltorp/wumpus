@@ -129,7 +129,7 @@ class WumpusGame:
             if direction in direction_to_index:
                 target_room_obj = connected_rooms[direction_to_index[direction]]
                 self.player.current_room = target_room_obj
-                ui.show_move_transition(self.player.current_room.room_id)
+                ui.show_move_transition(self.player.current_room.room_id, "move") # show moving animation
                 return True
             else:
                 ui.show_message("invalid_move")
@@ -140,7 +140,7 @@ class WumpusGame:
             return False
         
         for i in range(0, 3):
-            target_room = ui.ask_shoot_room(self.player.current_room.connected_rooms) # a room_id
+            target_room = ui.ask_shoot_room(self.player.current_room.connected_rooms) # returns a target room obj
             self.player.arrows -= 1
             ui.show_message("arrow_shot")
             if target_room.has_wumpus:
@@ -160,6 +160,7 @@ class WumpusGame:
             possible_rooms = [room for room in self.safe_rooms if room != self.player.current_room]
             ui.bat_grab_message(self.player.current_room.room_id)
             self.player.current_room = random.choice(possible_rooms)
+            ui.show_move_transition(self.player.current_room.room_id, "bat")
         return False
     
     def check_wumpus_encounter(self, ui) -> bool:
