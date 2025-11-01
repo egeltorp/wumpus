@@ -24,11 +24,13 @@ class TextUI:
         
         self.messages = {
             "no_arrows": "You have no arrows left!",
+            "arrow_miss": "Your arrow missed.\n",
             "wumpus_attack": "The Wumpus slobbers on your flesh!",
             "wumpus_hit": "The Wumpus has been struck!",
             "pit_fall": "You tripped into a pit like a bitch...",
             "invalid_move": "Not a valid move.",
             "invalid_action": "Not a valid action.",
+            "suicide": "You killed yourself with the arrow."
         }
 
     def show_message(self, key):

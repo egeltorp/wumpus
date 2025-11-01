@@ -165,7 +165,11 @@ class WumpusGame:
                 ui.show_message("wumpus_hit")
                 current_arrow_room.has_wumpus = False
                 return
-        print("The arrow lost its momentum and stopped.")
+            if current_arrow_room.room_id == self.player.current_room.room_id:
+                ui.show_message("suicide")
+                self.player.is_alive = False
+                return
+        ui.show_message("arrow_miss")
 
     def check_pit_kill(self, ui):
         if self.player.current_room.has_pit:
