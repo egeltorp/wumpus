@@ -172,7 +172,13 @@ class TextUI:
         # Show win/lose result
         if result == "win":
             time.sleep(1)
-            self.console.print("[bold green]Huzzah! The ol' Wumpus has been executed by a swift arrow! You win![/bold green]")
+            print(".")
+            time.sleep(1)
+            print(".")
+            time.sleep(1)
+            print(".")
+            win_text = Text.from_markup("[bold green]Huzzah! The ol' Wumpus has been executed by a swift arrow! You win![/bold green]")
+            self.console.print(Panel(win_text, expand=False, border_style="green"))
         elif result == "lose":
             time.sleep(1)
             self.console.print("[bold red]Ouch! You met a grim and quite frankly embarassing fate. Better luck next time bozo![/bold red]")
@@ -187,7 +193,7 @@ class TextUI:
             "[bold magenta][M][/bold magenta] Move\n"
             "[bold red][S][/bold red] Shoot an arrow"
         )
-        actions_panel = Panel(actions_panel_content, title="[bold white]ACTION[/bold white]", border_style="white",)
+        actions_panel = Panel(actions_panel_content, expand=False, title="[bold white]ACTION[/bold white]", border_style="white",)
 
         self.console.print(Columns([actions_panel, status_panel, senses_panel], equal=True))
 
