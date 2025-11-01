@@ -7,6 +7,8 @@ Utilizes the 'rich' library for fresh looking terminal output.
 Theodor Holmberg aka @egeltorp 2025
 '''
 import random
+import sys
+import time
 
 from rich.console import Console
 from rich.table import Table
@@ -32,7 +34,7 @@ class TextUI:
 
     def show_message(self, key):
         text = self.messages.get(key)
-        self.console.print(f"[bold yellow]{text}[/bold yellow]")
+        self.console.print(f"[bold italic yellow]{text}[/bold italic yellow]")
 
     def calculate_senses(self, sense_dict: dict) -> Panel:
         lines = []
@@ -47,7 +49,7 @@ class TextUI:
             lines.append("Nothing special...")
 
         if lines:
-            panel = Panel("\n".join(lines), title="[bold yellow]Senses[/bold yellow]", border_style="yellow")
+            panel = Panel("\n".join(lines), title="[bold yellow]SENSES[/bold yellow]", border_style="yellow")
             return panel
         
     def calculate_status(self, current_room_id: int, arrows: int, nearby_rooms: list) -> Panel:
@@ -58,11 +60,11 @@ class TextUI:
         lines.append(f"You are in room [bold magenta]{current_room_id}[/bold magenta].")
         lines.append(f"You have [bold red]{arrows}[/bold red] arrows left.")
         lines.append(f"Nearby rooms: [bold magenta]{rooms}[/bold magenta]")
-        status_panel = Panel("\n".join(lines), title="[bold magenta]Status[/bold magenta]", border_style="magenta")
+        status_panel = Panel("\n".join(lines), title="[bold magenta]STATUS[/bold magenta]", border_style="magenta")
         return status_panel
 
     def ask_action(self):
-        input_text = Text("Enter your action (M/S): ", style="bold green")
+        input_text = Text.from_markup("Enter your action ([magenta]M[/magenta]/[red]S[/red]): ", style="bold")
         action = self.console.input(input_text).strip().upper()      
         return action
 
@@ -78,6 +80,7 @@ class TextUI:
         return target_room_id
 
     def show_welcome(self):
+        # Title panel
         title = Text("WUMPUS", style="bold red on black", justify="center")
         subtitle = Text("Beneath Hardox... he waits.")
         panel = Panel(
@@ -88,11 +91,55 @@ class TextUI:
         )
         self.console.print(panel)
 
+        yes = "[green]Y[/green]"
+        no = "[red]N[/red]"
+        skip_text = Text.from_markup(f"Skip intro? [{yes}/{no}]: ", style="bold")
+        skip = self.console.input(skip_text).strip().upper()
+        if skip == "Y":
+            return
+
+        # Intro text
+        lines = [
+            "> You find yourself in the culverts beneath Hardox, where the gluttonous Wumpus resides.",
+            "> To avoid being eaten you have to shoot Wumpus with your bow and arrow.",
+            "> The culverts are all connected to a number of rooms via cramped tunnels.",
+            "> You can move North, East, South, or West from one room to another.",
+            "> Here lurks a number of dangers however:",
+            "- Some rooms contain BOTTOMLESS PITS, and falling into one means certain death.",
+            "- Others contain BATS, which will fly you to a random room of their choosing.",
+            "> In one of the rooms... lurks the mighty Wumpus.",
+            "> If encountered, he will instantly gobble you up and you WILL die.",
+            "> Luckily, via the SENSES DISPLAY you can feel the cold breeze of a pit nearby, or the flapping of wings...",
+            "> ...or the stench of Wumpus.",
+            "> Via the STATUS BAR you can see: ",
+            "- The room you are currently in",
+            "- Nearby rooms.",
+            "- How many arrows you have left.",
+            "X To win the game you have to shoot and kill Wumpus.",
+            "X When you shoot an arrow it will move through THREE rooms.",
+            "X You can direct the arrow's direction in each room it enters.",
+            "X Be careful however! The tunnels wind in unexpected ways...",
+            "X You might shoot yourself! Bozo.",
+            "X You have FIVE arrows.",
+            "> Qapla' and good luck!"
+        ]
+
+        for line in lines:
+            for char in line:
+                self.console.print(char, end="", style="bold white", justify="center")
+                sys.stdout.flush()
+                time.sleep(0.01)
+            self.console.print()
+            time.sleep(0.3)
+
+
     def show_result(self, result: str):
         # Show win/lose result
         if result == "win":
+            time.sleep(1)
             self.console.print("[bold green]Huzzah! The ol' Wumpus has been executed by a swift arrow! You win![/bold green]")
         elif result == "lose":
+            time.sleep(1)
             self.console.print("[bold red]Ouch! You met a grim and quite frankly embarassing fate. Better luck next time bozo![/bold red]")
 
     def show_panels(self, senses_panel: Panel, status_panel: Panel):
