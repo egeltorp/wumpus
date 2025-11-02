@@ -6,6 +6,10 @@
 - io_cli.py
 - gui_cli.py
 
+### Requirements
+- Python 3.x
+- `rich` package installed (`pip install rich`)
+
 ### P-del (LAB3)
 En individuell programmeringsuppgift i Python som består av följande fyra delar.  
 Räkna med ca <ins>80 timmars arbete</ins>. 
