@@ -23,19 +23,20 @@ class TextUI:
         self.console = Console()
         
         self.messages = {
-            "no_arrows": "You have no arrows left!",
+            "no_arrows": "You have no arrows left!\n",
             "arrow_miss": "Your arrow missed.\n",
-            "wumpus_attack": "The Wumpus slobbers on your flesh!",
-            "wumpus_hit": "The Wumpus has been struck!",
-            "pit_fall": "You tripped into a pit like a bitch...",
-            "invalid_move": "Not a valid move.",
-            "invalid_action": "Not a valid action.",
-            "suicide": "You killed yourself with the arrow."
+            "wumpus_attack": "The Wumpus slobbers on your flesh!\n",
+            "wumpus_hit": "The Wumpus has been struck!\n",
+            "pit_fall": "[bold blue]You tripped into a pit like a bitch...[/bold blue]\n",
+            "invalid_direction": "[bold red]Not a valid direction.[/bold red]\n",
+            "invalid_action": "[bold red]Not a valid action.[/bold red]\n",
+            "suicide": "[bold red]You killed yourself with the arrow.[/bold red]\n"
         }
 
     def show_message(self, key):
         text = self.messages.get(key)
-        self.console.print(f"[bold italic yellow]{text}[/bold italic yellow]")
+        text_formatted = Text.from_markup(text)
+        self.console.print(f"{text}")
 
     def calculate_senses(self, sense_dict: dict) -> Panel:
         lines = []
@@ -83,7 +84,7 @@ class TextUI:
     def show_move_transition(self, new_room_id, move_or_bat: str):
         # if it's a bat transport
         if move_or_bat == "bat":
-            self.console.print("A bat grabs you!", end="", style="bold italic yellow")
+            self.console.print("A [red]bat[/red] grabs you!", end="", style="bold italic white")
             print()
 
         # print dots for "movement"
@@ -109,9 +110,6 @@ class TextUI:
             self.console.print(f"The {arrow} enters the seconds room.")
         if room_number == 3:
             self.console.print(f"The {arrow} enters the third room.")
-    
-    def bat_grab_message(self, new_room_id):
-        text = f"A bat grabs you... and drops you in Room {new_room_id}!"
         
     def show_welcome(self):
         # Title panel
@@ -126,13 +124,18 @@ class TextUI:
         self.console.print(panel)
 
         # Skip intro prompt
-        yes = "[green]Y[/green]"
-        no = "[red]N[/red]"
+        yes = "[bold green]Y[/bold green]"
+        no = "[bold red]N[/bold red]"
         prompt = Text.from_markup(f"> SKIP INTRO? [{yes}/{no}]: ", style="bold white")
-        skip = self.console.input(prompt).strip().upper()
-        if skip == "Y":
-            self.clear_prompt("prompt")
-            return
+        while True:
+            skip = self.console.input(prompt).strip().upper()
+            if skip == "Y":
+                self.clear_prompt("prompt")
+                return
+            if skip == "N":
+                break
+            else:
+                self.console.print(Text.from_markup(f"[bold red]X[/bold red] Input must be {yes} or {no}\n", style="white"))
 
         # Intro text
         lines = [
