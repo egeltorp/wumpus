@@ -7,15 +7,17 @@ Theodor Holmberg aka @egeltorp 2025
 '''
 
 from io_cli import TextUI
-# from io_gui import GUI
 from game import WumpusGame
+import random
 
 # PARAMETERS
-NUM_ROOMS = 40  # no. of rooms
+NUM_ROOMS = 20  # no. of rooms
 PIT_RATE = 0.2  # % of rooms with PITS
 BAT_RATE = 0.3  # % of rooms with BATS
 ARROWS = 5      # starting no. of ARROWS
-SEED = 1701     # seed for random module
+
+# seed for random module
+SEED = random.randrange(1, 100)
 
 def run_game(ui, game: WumpusGame):
     # SETUP
@@ -25,23 +27,22 @@ def run_game(ui, game: WumpusGame):
     game.place_hazards()
     game.place_player()
 
+    # WELCOME and INTRO
     ui.show_welcome()
 
+    # RUN GAME
     while not game.is_over():
         game.play_turn(ui)
         game.check_game_state()
     
+    # SHOW RESULT AFTER GAME ENDED
     if game.check_game_state() == "win":
         ui.show_result("win")
     if game.check_game_state() == "lose":
         ui.show_result("lose")
 
 def main():
-    # UI for CLI
     ui = TextUI()
-
-    # UI for GUI
-    # ui = GUI()
 
     game = WumpusGame(num_rooms = NUM_ROOMS,
                     pit_rate = PIT_RATE, 
@@ -52,9 +53,9 @@ def main():
                     seed = SEED)
     while True:
         run_game(ui, game)
-        answer = ui.console.input("[bold white]Play again? [[green]Y[/green]/[red]N[/red]]: [/bold white]").strip().upper()
+        answer = ui.console.input("[bold white]Play again? [[green]Y[/green]/[red]N[/red]]: [/bold white]\n").strip().upper()
         if answer != "Y":
-            ui.console.print("[bold red]Goodbye![/bold red]")
+            ui.console.print("[bold red]Goodbye![/bold red]\n")
             break
 
 if __name__ == "__main__":
