@@ -2,7 +2,7 @@
 game.py
 --------
 Contains all pure game logic for Wumpus.
-Handles room generation, hazards, movement, and combat.
+Handles room generation, hazards, movement, and shooting.
 Does not perform any input/output — game.py refers to io_cli.py for UI.
 --------
 Theodor Holmberg aka @egeltorp 2025
@@ -51,8 +51,6 @@ class WumpusGame:
         number_of_connections = 4
         safety_limit = 500
 
-        ### BUGGED, sometimes causes a room to only get 2 connections instead of 4
-
         # Run this code for each room in self.rooms
         for room in self.rooms:
             attempts = 0
@@ -100,17 +98,19 @@ class WumpusGame:
 
     def place_player(self):
         # Place player in a random empty room
-        # spawn_room = random.choice(self.safe_rooms)
+        spawn_room = random.choice(self.safe_rooms)
 
         # debugging with spawning in room 39
         # M -> N to 21
         # M -> S to 25
-        # S -> Shoot room 8 
+        # S -> Shoot room 8
+        '''
         spawn_room = None
         for room in self.safe_rooms:
             if room.room_id == 39:
                 spawn_room = room
                 break
+        '''
 
         # Creates a Player instance in WumpusGame class
         self.player = Player(spawn_room, self.starting_arrows)
@@ -142,7 +142,7 @@ class WumpusGame:
                 ui.show_move_transition(self.player.current_room.room_id, "move") # show moving animation
                 return True
             else:
-                ui.show_message("invalid_move")
+                ui.show_message("invalid_direction")
 
     def shoot_arrow(self, ui):
         self.player.arrows -= 1
@@ -160,6 +160,8 @@ class WumpusGame:
                 if direction in direction_to_index:
                     current_arrow_room = connected_rooms[direction_to_index[direction]]
                     break
+                else:
+                    ui.show_message("invalid_direction")
             ui.shooting_text(i + 1)
             if current_arrow_room.has_wumpus:
                 current_arrow_room.has_wumpus = False
@@ -178,7 +180,6 @@ class WumpusGame:
     def check_bats_transport(self, ui) -> bool:
         if self.player.current_room.has_bats:
             possible_rooms = [room for room in self.safe_rooms if room != self.player.current_room]
-            ui.bat_grab_message(self.player.current_room.room_id)
             self.player.current_room = random.choice(possible_rooms)
             ui.show_move_transition(self.player.current_room.room_id, "bat")
         return False
