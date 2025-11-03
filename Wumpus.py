@@ -530,6 +530,7 @@ class WumpusGame:
                 target_room_obj = connected_rooms[direction_to_index[direction]]
                 self.player.current_room = target_room_obj
                 ui.show_move_transition(self.player.current_room.room_id, "move") # show moving animation
+                return
             else:
                 ui.show_message("invalid_direction")
 
