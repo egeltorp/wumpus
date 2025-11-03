@@ -52,12 +52,12 @@ def run_game(ui, game):
     # RUN GAME TURNS UNTIL END
     while not game.is_over():
         game.play_turn(ui)
-        game.check_game_state()
+        game.check_game_state(ui)
     
     # SHOW RESULT AFTER GAME ENDED
-    if game.check_game_state() == "win":
+    if game.check_game_state(ui) == "win":
         ui.show_result("win")
-    if game.check_game_state() == "lose":
+    if game.check_game_state(ui) == "lose":
         ui.show_result("lose")
 
 # Main function initializing the program
@@ -607,7 +607,7 @@ class WumpusGame:
     
     # Method for ending game in run_game() function
     def is_over(self) -> bool:
-        state = self.check_game_state()
+        state = self.check_game_state(ui)
         if state == "lose":
             return True
         elif state == "win":
