@@ -9,6 +9,7 @@ Theodor Holmberg aka @egeltorp 2025
 """
 
 import random
+from collections import deque
 
 class Room:
     def __init__(self, room_id: int):
@@ -25,21 +26,23 @@ class Player:
         self.is_alive = True
 
 class WumpusGame:
-    def __init__(self, num_rooms: int = 16, 
+    def __init__(self, 
+                 num_rooms: int = 16, 
                  pit_rate: float = 0.2, 
                  bat_rate: float = 0.3,
                  starting_arrows: int = 5,
-                 rooms: list = [],
-                 safe_rooms: list = [],
+                 wumpus_chases: bool = False,
                  seed: int = 1701):
         self.num_rooms = num_rooms
         self.pit_rate = pit_rate
         self.bat_rate = bat_rate
         self.starting_arrows = starting_arrows
-        self.rooms = rooms
-        self.safe_rooms = safe_rooms
+        self.wumpus_chases = wumpus_chases
         self.seed = seed
+        self.rooms = []
+        self.safe_rooms = []
         self.state = "running"
+        self.wumpus_room: Room = None
 
     def random_seed(self):
         random.seed(self.seed)
@@ -90,27 +93,60 @@ class WumpusGame:
 
         # Place Wumpus in a random empty room
         empty_room = [room for room in self.rooms if not room.has_pit and not room.has_bats]
-        wumpus_room = random.choice(empty_room)
-        wumpus_room.has_wumpus = True
+        self.wumpus_room = random.choice(empty_room)
+        self.wumpus_room.has_wumpus = True
 
         # Store safe rooms
         self.safe_rooms = [room for room in self.rooms if not room.has_pit and not room.has_bats and not room.has_wumpus]
 
+    def wumpus_chase(self, ui):
+        # If wumpus_chases is true: get closeer to player each turn
+        if self.wumpus_chases == True:
+            self.wumpus_room.has_wumpus = False # Remove old has_wumpus flag
+            start = self.wumpus_room
+            goal = self.player.current_room
+
+            # If the Wumpus is already in the same room: return
+            if start == goal:
+                self.wumpus_room.has_wumpus = True
+                return
+            
+            # Find the shortest path to the player from start --> goal, using helper method
+            path = self.find_path(start, goal)
+
+            # Move Wumpus one step closer to player
+            if len(path) > 1:
+                self.wumpus_room = path[1]
+                ui.show_message("wumpus_move")
+                # DEBUG: print(f"Wumpus MOVED to ROOM {self.wumpus_room.room_id}")
+            else:
+                # If no path exists, just move randomly
+                self.wumpus_room = random.choice(self.safe_rooms)
+                ui.show_message("wumpus_move")
+                # DEBUG: print(f"Wumpus MOVED (randomly) to ROOM {self.wumpus_room.room_id}")
+
+            # Set new flag for room with Wumpus
+            self.wumpus_room.has_wumpus = True
+
+    def find_path(self, start, goal):
+        queue = deque([[start]])
+        visited = {start}
+
+        while queue:
+            path = queue.popleft()
+            room = path[-1]
+            if room == goal:
+                return path
+            for neighbor in room.connected_rooms:
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    queue.append(path + [neighbor])
+
+        return []
+
     def place_player(self):
         # Place player in a random empty room
         spawn_room = random.choice(self.safe_rooms)
-
-        # debugging with spawning in room 39
-        # M -> N to 21
-        # M -> S to 25
-        # S -> Shoot room 8
-        '''
-        spawn_room = None
-        for room in self.safe_rooms:
-            if room.room_id == 39:
-                spawn_room = room
-                break
-        '''
 
         # Creates a Player instance in WumpusGame class
         self.player = Player(spawn_room, self.starting_arrows)
@@ -229,9 +265,11 @@ class WumpusGame:
 
         if action == "M":
             self.move_player(ui)
-            # automatic checks after moving
             self.check_pit_kill(ui)
             self.check_bats_transport(ui)
+
+            # Move Wumpus and check for encounter
+            self.wumpus_chase(ui)
             self.check_wumpus_encounter(ui)
 
         elif action == "S":
