@@ -24,7 +24,8 @@ class TextUI:
         self.messages = {
             "no_arrows": "You have no arrows left!\n",
             "arrow_miss": "Your arrow missed.\n",
-            "wumpus_attack": "The Wumpus slobbers on your flesh!\n",
+            "wumpus_attack": "[bold red]The Wumpus SLOBBERS on your FLESH![/bold red]\n",
+            "wumpus_move": "[italic red]The Wumpus stomps closer![/italic red]\n",
             "wumpus_hit": "The Wumpus has been struck!\n",
             "pit_fall": "[bold blue]You tripped into a pit like a bitch...[/bold blue]\n",
             "invalid_direction": "[bold red]Not a valid direction.[/bold red]\n",
@@ -34,18 +35,18 @@ class TextUI:
     
     def choose_difficulty(self):
         # Easy difficulty, easier than standard parameters
-        e_dict = {"num_rooms": 15, "pit_rate": 0.1, "bat_rate": 0.2, "starting_arrows": 6}
-        easy_text = Text.from_markup("Rooms: 15\nPits: 10%\nBats: 20%\nArrows: 6", justify="center")
+        e_dict = {"num_rooms": 15, "pit_rate": 0.1, "bat_rate": 0.2, "starting_arrows": 6, "wumpus_chases": False}
+        easy_text = Text.from_markup("Rooms: 15\nPits: 10%\nBats: 20%\nArrows: 6\nWumpus lurks...", justify="center")
         easy_panel = Panel(easy_text, title="[bold green]EASY [E][/bold green]", border_style="green", padding=(1,2))
 
         # Normal difficulty, standard Assignment parameters
-        n_dict = {"num_rooms": 20, "pit_rate": 0.2, "bat_rate": 0.3, "starting_arrows": 5}
-        normal_text = Text.from_markup("Rooms: 20\nPits: 20%\nBats: 30%\nArrows: 5", justify="center")
+        n_dict = {"num_rooms": 20, "pit_rate": 0.2, "bat_rate": 0.3, "starting_arrows": 5, "wumpus_chases": False}
+        normal_text = Text.from_markup("Rooms: 20\nPits: 20%\nBats: 30%\nArrows: 5\nWumpus lurks...", justify="center")
         normal_panel = Panel(normal_text, title="[bold yellow]NORMAL [N][/bold yellow]", border_style="yellow", padding=(1,2))
 
         # Hard difficulty, very difficult, more rooms, less arrows
-        h_dict = {"num_rooms": 30, "pit_rate": 0.25, "bat_rate": 0.35, "starting_arrows": 3}
-        hard_text = Text.from_markup("Rooms: 30\nPits: 25%\nBats: 35%\nArrows: 3", justify="center")
+        h_dict = {"num_rooms": 30, "pit_rate": 0.25, "bat_rate": 0.35, "starting_arrows": 3, "wumpus_chases": True}
+        hard_text = Text.from_markup("Rooms: 30\nPits: 25%\nBats: 35%\nArrows: 3\nWumpus will chase you!", justify="center")
         hard_panel = Panel(hard_text, title="[bold red]HARDOX [H][/bold red]", border_style="red", padding=(1,2))
 
         # Arrange difficulty panels in a nice 3 column row of panels
