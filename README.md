@@ -1,5 +1,8 @@
 # wumpus
 
+### Version
+Legacy UI | B-grade | Print | One-file | Nov 4th 2025
+
 ### File structure
 - Wumpus.py
 - specification.py
@@ -7,7 +10,6 @@
 
 ### Requirements
 - Python 3.x
-- `rich` package installed (`pip install rich`)
 
 ### Project Assignment (LAB3)
 An individual programming assignment in Python consisting of the following four parts.  
