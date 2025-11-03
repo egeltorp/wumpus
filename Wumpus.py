@@ -176,7 +176,7 @@ class TextUI:
         if lines == []:
             lines.append("Nothing special...")
         if lines:
-            panel = Panel("\n".join(lines), title="[bold yellow]SENSES[/bold yellow]", border_style="yellow")
+            panel = Panel("\n".join(lines), title="[bold yellow]SENSES[/bold yellow]", border_style="yellow", height=6)
             return panel
     
     # Displays status of player: current room, no. of arrows, nearby rooms
@@ -191,8 +191,23 @@ class TextUI:
         lines.append(f"Nearby rooms: [bold magenta]{rooms_formatted}[/bold magenta]")
         lines.append(f"Directions: [bold magenta]{directions}[/bold magenta]")
 
-        status_panel = Panel("\n".join(lines), title="[bold magenta]STATUS[/bold magenta]", border_style="magenta")
+        status_panel = Panel("\n".join(lines), title="[bold magenta]STATUS[/bold magenta]", border_style="magenta", height=6)
         return status_panel
+    
+        # Takes senses_panel and status_panel with actions_panel and arranges them into three columns 
+    def show_panels(self, senses_panel: Panel, status_panel: Panel):
+        # Actions panel
+        actions_panel_content = (
+            "[bold white]What do you want to do?[/bold white]\n"
+            "\n"
+            "[bold magenta][M][/bold magenta] Move\n"
+            "[bold red][S][/bold red] Shoot an arrow"
+        )
+        actions_panel = Panel(actions_panel_content, expand=False, title="[bold white]ACTION[/bold white]", border_style="white", height=6)
+
+        # Print all three panels in three columns
+        self.console.print(Columns([actions_panel, status_panel, senses_panel], equal=True))
+
 
     # Asks user for desired action [M]ove or [S]hoot, returns str
     def ask_action(self) -> str:
@@ -324,20 +339,6 @@ class TextUI:
         elif result == "lose":
             time.sleep(1)
             self.console.print("[bold red]Ouch! You met a grim and quite frankly embarassing fate. Better luck next time bozo![/bold red]")
-
-    # Takes senses_panel and status_panel with actions_panel and arranges them into three columns 
-    def show_panels(self, senses_panel: Panel, status_panel: Panel):
-        # Actions panel
-        actions_panel_content = (
-            "[bold white]What do you want to do?[/bold white]\n"
-            "\n"
-            "[bold magenta][M][/bold magenta] Move\n"
-            "[bold red][S][/bold red] Shoot an arrow"
-        )
-        actions_panel = Panel(actions_panel_content, expand=False, title="[bold white]ACTION[/bold white]", border_style="white",)
-
-        # Print all three panels in three columns
-        self.console.print(Columns([actions_panel, status_panel, senses_panel], equal=True))
 
     # General method for clearing a user prompt question, makes terminal cleaner
     def clear_prompt(self, to_clear: str):
@@ -620,7 +621,6 @@ class WumpusGame:
 
     # Main method for playing a full turn of the game
     def play_turn(self, ui: TextUI):
-        # ui.console.clear()
         senses = ui.display_senses(self.sense_environment())
         status = ui.display_status(self.player.current_room.room_id, 
                                      self.player.arrows, 
