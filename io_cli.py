@@ -6,7 +6,6 @@ Utilizes the 'rich' library for fresh looking terminal output.
 --------
 Theodor Holmberg aka @egeltorp 2025
 '''
-import random
 import sys
 import time
 
