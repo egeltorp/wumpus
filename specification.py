@@ -60,8 +60,8 @@ class TextUI:
 		"""Visar ett textmeddelande utifrån en key från messages dict."""
 		pass
 
-	def display_status(self):
-		"""Visar spelarens aktuella status (t.ex. rum, pilar)."""
+	def calculate_status(self):
+		"""Visar spelarens aktuella status (t.ex. rum, närliggande rum, pilar)."""
 		pass
 
 	# sinnen och händelser
@@ -118,36 +118,29 @@ BAT_RATE = 0.3
 ARROWS = 5
 SEED = 1701
 
-def run_game(ui: TextUI):
-    game = WumpusGame(num_rooms = NUM_ROOMS,
-                       pit_rate = PIT_RATE, 
-                       bat_rate = BAT_RATE, 
-                       starting_arrows = ARROWS,
-                       rooms = [], 
-                       safe_rooms = [],
-                       seed = SEED)
-    
+def run_game(ui, game: WumpusGame):
     # SETUP
+    # bygger alla delar av spelkartan och sätter ut spelaren
     game.random_seed()
     game.generate_rooms()
     game.connect_rooms()
     game.place_hazards()
     game.place_player()
-	
-    # INTRO
+
+    # WELCOME and INTRO
     ui.show_welcome()
 
-    # CORE LOOP
-	# while not game.is_over():
-        # game.sense_environment()
-        # ui.show_panels()
-        # ui.ask_action()
-        # do action
-        # something like that
-        # pass
-
-    # WIN
-    # ui.display_win()
+    # RUN GAME
+    # en loop som körs så länge game.is_over == False
+    while not game.is_over():
+        game.play_turn(ui)
+        game.check_game_state()
+    
+    # SHOW RESULT AFTER GAME ENDED
+    if game.check_game_state() == "win":
+        ui.show_result("win")
+    if game.check_game_state() == "lose":
+        ui.show_result("lose")
 
 def main():
     ui = TextUI()
@@ -157,22 +150,21 @@ if __name__ == "__main__":
     main()
 
 # ************************** Programskelett game.py ******************************
-import random
 
      #*************** Klasser och dess metoder******************
 class Room:
     def __init__(self, room_id: int):
-        self.room_id = room_id
-        self.connected_rooms = []
-        self.has_pit = False
-        self.has_bats = False
-        self.has_wumpus = False
+        self.room_id = room_id          # rum_id för rummet
+        self.connected_rooms = []       # lista med alla rum intill rummet
+        self.has_pit = False            # har avgrundshål: bool
+        self.has_bats = False           # har fladdermöss: bool
+        self.has_wumpus = False         # har wumpus: bool
 
 class Player:
     def __init__(self, starting_room: Room, starting_arrows: int):
-        self.current_room = starting_room
-        self.arrows = starting_arrows
-        self.is_alive = True
+        self.current_room = starting_room   # rummet spelaren startar i: Room-object
+        self.arrows = starting_arrows       # hur många pilar spelaren startar med
+        self.is_alive = True                # spelarens status: bool
 
 class WumpusGame:
     def __init__(self, num_rooms: int = 16, 
@@ -182,13 +174,13 @@ class WumpusGame:
                  rooms: list = [],
                  safe_rooms: list = [],
                  seed: int = 1701):
-        self.num_rooms = num_rooms
-        self.pit_rate = pit_rate
-        self.bat_rate = bat_rate
-        self.starting_arrows = starting_arrows
-        self.rooms = rooms
-        self.safe_rooms = safe_rooms
-        self.seed = seed
+        self.num_rooms = num_rooms              # antal rum i spelet
+        self.pit_rate = pit_rate                # hur många rum som har avgrundshål: float
+        self.bat_rate = bat_rate                # hur många rum: float
+        self.starting_arrows = starting_arrows  # antal pilar man startar med
+        self.rooms = rooms                      # alla rum i spelet: list
+        self.safe_rooms = safe_rooms            # alla rum utan faror: list
+        self.seed = seed                        # seed för reproducerbarhet
 
     def random_seed(self):
         # sätter en random seed för hur rummen skapas
@@ -234,3 +226,6 @@ class WumpusGame:
         # spelarens fulla tur i spelet
 		# anropar io_cli för input output och text
 		# anropar game.py metoder för spelets logik
+            
+    def is_over()
+        # kollar check_game_state och returnerar en bool baserat på game state
