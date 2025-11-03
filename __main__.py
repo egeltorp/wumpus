@@ -10,14 +10,8 @@ from io_cli import TextUI
 from game import WumpusGame
 import random
 
-# PARAMETERS for game session
-NUM_ROOMS = 20      # no. of rooms
-# PIT_RATE = 0.2    # % of rooms with PITS
-# BAT_RATE = 0.3    # % of rooms with BATS
-# ARROWS = 5          # starting no. of ARROWS
-
-# seed for random module
-SEED = random.randrange(1, 100)
+# PARAMETERS
+SEED = random.randrange(1, 1000)
 
 def run_game(ui, game: WumpusGame):
     # SETUP
@@ -26,9 +20,6 @@ def run_game(ui, game: WumpusGame):
     game.connect_rooms()
     game.place_hazards()
     game.place_player()
-
-    # WELCOME and INTRO
-    ui.show_welcome()
 
     # RUN GAME TURNS UNTIL END
     while not game.is_over():
@@ -45,16 +36,17 @@ def main():
     # Initialize the TextUI interface
     ui = TextUI()
 
-    # Choose difficulty, returns a dict with chosen parameters
-    params = ui.choose_difficulty()
+    # Show Welcome and Intro-text
+    ui.show_welcome()
 
-    # Create a new instance of the WumpusGame
-    game = WumpusGame(
-                    **params,
-                    rooms = [], 
-                    safe_rooms = [],
-                    seed = SEED)
+    # LOOP for replayability
     while True:
+        # Choose difficulty, returns a dict with chosen parameters
+        params = ui.choose_difficulty()
+
+        # Create a new instance of the WumpusGame
+        game = WumpusGame(**params, seed = SEED)
+
         # Run the full game loop
         run_game(ui, game)
 
