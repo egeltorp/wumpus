@@ -162,12 +162,12 @@ class WumpusGame:
             self.player.is_alive = False
 
     def shoot_arrow(self, ui):
-        self.player.arrows -= 1
-        direction_to_index = {"N": 0, "E": 1, "S": 2, "W": 3}
-
         if self.player.arrows <= 0:
             ui.show_message("no_arrows")
             return False
+        
+        self.player.arrows -= 1
+        direction_to_index = {"N": 0, "E": 1, "S": 2, "W": 3}
         
         for i in range(0, 3):
             current_arrow_room = self.player.current_room
