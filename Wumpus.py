@@ -96,7 +96,14 @@ class TextUI:
             "pit_fall": "You tripped into a bottomless PIT like a buffoon...\n",
             "invalid_direction": "NOT a valid direction.\n",
             "invalid_action": "NOT a valid action.\n",
-            "suicide": "You KILLED YOURSELF with the arrow.\n"
+            "suicide": "You KILLED YOURSELF with the arrow.\n",
+            "pit": "You feel a cold breeze.",
+            "bats": "You hear the flapping of wings...",
+            "stench": "You smell a FOUL STENCH, reminding you of Hardox!",
+            "death": "Ouch! You met a grim and quite frankly embarassing fate. Better luck next time bozo!",
+            "easy": "You chose EASY",
+            "normal": "You chose NORMAL",
+            "hard": "You chose HARD",
         }
 
     # Displays the difficulty levels in neat columns
@@ -162,35 +169,52 @@ Wumpus will CHASE you!
             choice = str(input(choice_text).strip().upper())
             if choice == "E":
                 self.clear_prompt("prompt")
-                print("You chose EASY\n")
+                self.show_message("easy", "action")
+                time.sleep(1)
                 return easy_dict
             if choice == "N":
                 self.clear_prompt("prompt")
-                print("You chose NORMAL\n")
+                self.show_message("normal", "action")
+                time.sleep(1)
                 return normal_dict
             if choice == "H":
                 self.clear_prompt("prompt")
-                print("You chose HARD\n")
+                self.show_message("hard", "action")
+                time.sleep(1)
                 return hard_dict
             else:
                 self.clear_prompt("prompt")
-                print("Not a valid difficulty!\n")
+                self.show_message("Not a valid difficulty!\n", "invalid")
 
     # General method for displaying a text message
-    def show_message(self, key: str):
+    def show_message(self, key: str, type: str):
+        # Get message to show
         text = self.messages.get(key)
-        print(f"{text}")
+
+        # Display style based on type
+        if type == "prompt":
+            print(f"> {text}")
+        if type == "action":
+            print(f"... {text}")
+        if type == "info":
+            print(f"--- {text}")
+        if type == "warn":
+            print(f"*** {text}")
+        if type == "event":
+            print(f"!!! {text}")
+        if type == "invalid":
+            print(f"XXX {text}")
 
     # Displays "senses" based on sense_environment() in WumpusGame
     def display_senses(self, sense_dict: dict):
         print()
         lines = []
         if sense_dict["pit"]:
-            print("You feel a cold breeze.")
+            self.show_message("pit", "warn")
         if sense_dict["bats"]:
-            print("You hear the flapping of wings...")
+            self.show_message("bats", "warn")
         if sense_dict["wumpus"]:
-            print("You smell a foul stench, reminding you of Hardox!")
+            self.show_message("stench", "warn")
         print()
     
     # Displays status of player: current room, no. of arrows, nearby rooms
@@ -199,9 +223,9 @@ Wumpus will CHASE you!
         room_ids = [r.room_id for r in nearby_rooms]
         rooms_formatted = "  ".join(f"{r:>2}" for r in room_ids)
 
-        print(f"You are in room {current_room_id}.")
-        print(f"You have {arrows} arrows left.")
-        print(f"Nearby rooms: {rooms_formatted}\n")
+        print(f"--- You are in room {current_room_id}.")
+        print(f"--- You have {arrows} arrows left.")
+        print(f"--- Nearby rooms: {rooms_formatted}\n")
 
     # Asks user for desired action [M]ove or [S]hoot, returns str
     def ask_action(self) -> str:
@@ -216,9 +240,11 @@ Wumpus will CHASE you!
         choice_text = "> [N/E/S/W] Direction: "
 
         if move_or_shoot == "move":
-            print(f"You are currently in room {room_id}.")
+            print(f"--- You are currently in room {room_id}.")
+            print("> Where do you want to move?")
         if move_or_shoot == "shoot":
-            print("Where do you want to shoot?")
+            print("--- You can curve the path of the arrow three times.")
+            print("> Where do you want to aim?")
         
         while True:
             choice = str(input(choice_text).strip().upper())
@@ -226,21 +252,21 @@ Wumpus will CHASE you!
                 direction = direction_to_index[choice] # turns N/E/S/W: str into 0/1/2/3: int
                 break
             else:
-                self.show_message("invalid_direction")
+                self.show_message("invalid_direction", "invalid")
 
         if move_or_shoot == "shoot":
-            print(f"You shoot {direction_strings[direction]}")
+            print(f"... You aim {direction_strings[direction]}")
 
         return direction
     
     # Display text for arrow movement
     def shooting_text(self, room_number: int):
         if room_number == 1:
-            print("The arrow enters the FIRST room.\n")
+            print("... The arrow enters the FIRST room.\n")
         if room_number == 2:
-            print("The arrow enters the SECOND room.\n")
+            print("... The arrow enters the SECOND room.\n")
         if room_number == 3:
-            print("The arrow enters the THIRD room.\n")
+            print("... The arrow enters the THIRD room.\n")
     
     
     # Shows a "moving transition" in the terminal based on movement type
@@ -326,12 +352,12 @@ Wumpus will CHASE you!
             print(".")
             time.sleep(1)
             print(".")
-            print("Huzzah! The ol' WUMPUS has been executed by a swift arrow! You win!")
+            print(">>> Huzzah! The ol' WUMPUS has been executed by a swift arrow! You win!")
         
         # Show loss result
         elif result == "lose":
             time.sleep(1)
-            print("XXX Ouch! You met a grim and quite frankly embarassing fate. Better luck next time bozo!")
+            self.show_message("death", "event")
 
     # General method for clearing a user prompt question, makes terminal cleaner
     def clear_prompt(self, to_clear: str):
@@ -460,12 +486,12 @@ class WumpusGame:
             # Move Wumpus one step closer to player
             if len(path) > 1:
                 self.wumpus_room = path[1]
-                ui.show_message("wumpus_move")
+                ui.show_message("wumpus_move", "warn")
                 # DEBUG: print(f"Wumpus MOVED to ROOM {self.wumpus_room.room_id}")
             else:
                 # If no path exists, just move randomly
                 self.wumpus_room = random.choice(self.safe_rooms)
-                ui.show_message("wumpus_move")
+                ui.show_message("wumpus_move", "warn")
                 # DEBUG: print(f"Wumpus MOVED (randomly) to ROOM {self.wumpus_room.room_id}")
 
             # Set new flag for room with Wumpus
@@ -527,7 +553,7 @@ class WumpusGame:
     # Checks if player has entered a room with a pit
     def check_pit_kill(self, ui: TextUI):
         if self.player.current_room.has_pit:
-            ui.show_message("pit_fall")
+            ui.show_message("pit_fall", "event")
             self.player.is_alive = False
 
     # Checks if player has entered a room with bats, transports player
@@ -540,14 +566,14 @@ class WumpusGame:
     # Checks for player encounter with Wumpus, changes alive-status of Player instance
     def check_wumpus_encounter(self, ui: TextUI):
         if self.player.current_room.has_wumpus:
-            ui.show_message("wumpus_attack")
+            ui.show_message("wumpus_attack", "event")
             self.player.is_alive = False
 
     # Logic fo shooting and steering arrows
     def shoot_arrow(self, ui: TextUI):
         # Early escape if no more arrows
         if self.player.arrows <= 0:
-            ui.show_message("no_arrows")
+            ui.show_message("no_arrows", "warn")
             return
         
         # Decrement no. of arrows available
@@ -568,10 +594,10 @@ class WumpusGame:
             
             # If arrow "hits" player
             if current_arrow_room.room_id == self.player.current_room.room_id:
-                ui.show_message("suicide")
+                ui.show_message("suicide", "event")
                 self.player.is_alive = False
                 return
-        ui.show_message("arrow_miss")
+        ui.show_message("arrow_miss", "info")
 
     # Checks game status based on Wumpus existance or Player alive/arrows status
     def check_game_state(self, ui: TextUI) -> str:
@@ -579,7 +605,7 @@ class WumpusGame:
         if not self.player.is_alive:
             return "lose"
         elif self.player.arrows <= 0:
-            ui.show_message("no_arrows")
+            ui.show_message("no_arrows", "info")
             return "lose"
         
         # If Wumpus is dead, player wins
@@ -612,7 +638,7 @@ class WumpusGame:
             if action in ("M", "S"):
                 break
             else:
-                ui.show_message("invalid_action")
+                ui.show_message("invalid_action", "invalid")
 
         # Move or Shoot
         if action == "M":
