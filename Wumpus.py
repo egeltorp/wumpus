@@ -1,17 +1,10 @@
 '''
 Wumpus.py
 --------
-Version: B-grade | Rich | One-file | Nov 3rd 2025
+Version: Legacy UI | B-grade | Print | One-file | Nov 4th 2025
 * Choose difficulty
 * Wumpus chases on HARD
 * One file for all code
-
-The full runnable game, with all three modules merged: 
-* __main__.py
-* io_cli.py
-* game.py
-
-Uses the rich module for text formatting
 --------
 Theodor Holmberg aka @egeltorp 2025
 '''
@@ -54,7 +47,7 @@ def run_game(ui, game):
 # Main function initializing the program
 def main():
     # Print version number
-    print("\nVersion: B-grade | Rich | One-file | Nov 3rd 2025\n")
+    print("\nVersion: Legacy | B-grade | Print | One-file | Nov 3rd 2025\n")
 
     # Initialize the TextUI interface
     ui = TextUI()
