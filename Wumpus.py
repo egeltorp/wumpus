@@ -22,15 +22,6 @@ import sys
 import time
 from collections import deque
 
-# --- RICH --- 
-from rich.console import Console
-from rich.table import Table
-from rich.text import Text
-from rich import box
-from rich.panel import Panel
-from rich.columns import Columns
-from rich.align import Align
-
 # ==============================================================
 #                           M A I N
 # ==============================================================
@@ -82,139 +73,181 @@ def main():
         run_game(ui, game)
 
         # Check if the user wants to play again, if YES: restart loop and run again
-        answer = ui.console.input("[bold white]Play again? [[green]Y[/green]/[red]N[/red]]: [/bold white]\n").strip().upper()
+        answer = input("> Play again? [Y/N]: \n").strip().upper()
         if answer != "Y":
-            ui.console.print("[bold red]Goodbye![/bold red]\n")
+            print("Goodbye!\n")
             break
 
 # ==============================================================
 #                        T E X T   U I
 # ==============================================================
-# Handles console input/output using rich
-# Provides menus, messages, status panels, player interaction
+# Handles console input/output, Python print for legacy styling
+# Provides menus, messages, status, player interaction
 # ==============================================================
 # Class for TextUI interfaces, input/output
 class TextUI:
     def __init__(self):
-        self.console = Console()
-        
         self.messages = {
             "no_arrows": "You have no arrows left!\n",
             "arrow_miss": "Your arrow missed.\n",
-            "wumpus_attack": "[bold red]The Wumpus SLOBBERS on your FLESH![/bold red]\n",
-            "wumpus_move": "[italic red]The Wumpus stomps closer![/italic red]\n",
-            "wumpus_hit": "The Wumpus has been struck!\n",
-            "pit_fall": "[bold blue]You tripped into a bottomless pit like a buffoon...[/bold blue]\n",
-            "invalid_direction": "[bold red]Not a valid direction.[/bold red]\n",
-            "invalid_action": "[bold red]Not a valid action.[/bold red]\n",
-            "suicide": "[bold red]You killed yourself with the arrow.[/bold red]\n"
+            "wumpus_attack": "The Wumpus slobbers on your flesh!\n",
+            "wumpus_move": "The Wumpus stomps CLOSER!\n",
+            "wumpus_hit": "The Wumpus has been STRUCK!\n",
+            "pit_fall": "You tripped into a bottomless PIT like a buffoon...\n",
+            "invalid_direction": "NOT a valid direction.\n",
+            "invalid_action": "NOT a valid action.\n",
+            "suicide": "You KILLED YOURSELF with the arrow.\n"
         }
-    
+
+    # Displays the difficulty levels in neat columns
+    def display_difficulties(self):
+        easy = """- EASY -
+Rooms: 15
+Pits: 10%
+Bats: 20%
+Arrows: 6
+Wumpus lurks...
+"""
+
+        normal = """- NORMAL -
+Rooms: 20
+Pits: 20%
+Bats: 35%
+Arrows: 5
+Wumpus lurks...
+"""
+
+        hard = """- HARD -
+Rooms: 30
+Pits: 25%
+Bats: 35%
+Arrows: 3
+Wumpus will CHASE you!
+"""
+
+        # Split each difficulty into lines and pad nicely
+        col1 = easy.strip().splitlines()
+        col2 = normal.strip().splitlines()
+        col3 = hard.strip().splitlines()
+
+        # Calc max no. of lines and pad
+        max_lines = max(len(col1), len(col2), len(col3))
+        col1 += [""] * (max_lines - len(col1))
+        col2 += [""] * (max_lines - len(col2))
+        col3 += [""] * (max_lines - len(col3))
+        padding = 6
+
+        # Print columns (using no rich module!! Impressive right...?)
+        for a, b, c in zip(col1, col2, col3):
+            print(f"{a:<20}{' ' * padding}{b:<20}{' ' * padding}{c:<20}")
+
     # User chooses difficulty with input letter [E/N/H]
     def choose_difficulty(self) -> dict:
+        # Display all difficulty levels
+        self.display_difficulties()
+
         # Easy difficulty, easier than standard parameters
-        e_dict = {"num_rooms": 15, "pit_rate": 0.1, "bat_rate": 0.2, "starting_arrows": 6, "wumpus_chases": False}
-        easy_text = Text.from_markup("Rooms: 15\nPits: 10%\nBats: 20%\nArrows: 6\nWumpus lurks...", justify="center")
-        easy_panel = Panel(easy_text, title="[bold green]EASY [E][/bold green]", border_style="green", padding=(1,2))
+        easy_dict = {"num_rooms": 15, "pit_rate": 0.1, "bat_rate": 0.2, "starting_arrows": 6, "wumpus_chases": False}
 
         # Normal difficulty, standard Assignment parameters
-        n_dict = {"num_rooms": 20, "pit_rate": 0.2, "bat_rate": 0.3, "starting_arrows": 5, "wumpus_chases": False}
-        normal_text = Text.from_markup("Rooms: 20\nPits: 20%\nBats: 30%\nArrows: 5\nWumpus lurks...", justify="center")
-        normal_panel = Panel(normal_text, title="[bold yellow]NORMAL [N][/bold yellow]", border_style="yellow", padding=(1,2))
+        normal_dict = {"num_rooms": 20, "pit_rate": 0.2, "bat_rate": 0.3, "starting_arrows": 5, "wumpus_chases": False}
 
         # Hard difficulty, very difficult, more rooms, less arrows
-        h_dict = {"num_rooms": 30, "pit_rate": 0.25, "bat_rate": 0.35, "starting_arrows": 3, "wumpus_chases": True}
-        hard_text = Text.from_markup("Rooms: 30\nPits: 25%\nBats: 35%\nArrows: 3\nWumpus will chase you!", justify="center")
-        hard_panel = Panel(hard_text, title="[bold red]HARDOX [H][/bold red]", border_style="red", padding=(1,2))
-
-        # Arrange difficulty panels in a nice 3 column row of panels
-        columns = Columns([easy_panel, normal_panel, hard_panel], expand=True)
-
-        # Display columns in one panel
-        main_panel = Panel(columns, title="[bold white]DIFFICULTIES[/bold white]", box=box.SIMPLE_HEAD, border_style="white", padding=(1,1))
-        self.console.print(main_panel)
+        hard_dict = {"num_rooms": 30, "pit_rate": 0.25, "bat_rate": 0.35, "starting_arrows": 3, "wumpus_chases": True}
+        
 
         # Ask for difficulty choice
-        E = "[bold green]E[/bold green]"
-        N = "[bold yellow]N[/bold yellow]"
-        H = "[bold red]H[/bold red]"
         while True:
-            choice_text = Text.from_markup(f"Choose a difficulty [{E}/{N}/{H}]: ", style="bold white")
-            choice = self.console.input(choice_text).strip().upper()
+            choice_text = "\n> Choose a difficulty [E/N/H]: "
+            choice = str(input(choice_text).strip().upper())
             if choice == "E":
                 self.clear_prompt("prompt")
-                self.console.print("You chose [bold green]EASY[/bold green]\n")
-                return e_dict
+                print("You chose EASY\n")
+                return easy_dict
             if choice == "N":
                 self.clear_prompt("prompt")
-                self.console.print("You chose [bold yellow]NORMAL[/bold yellow]\n")
-                return n_dict
+                print("You chose NORMAL\n")
+                return normal_dict
             if choice == "H":
                 self.clear_prompt("prompt")
-                self.console.print("You chose [bold red]HARD[/bold red]\n")
-                return h_dict
+                print("You chose HARD\n")
+                return hard_dict
             else:
                 self.clear_prompt("prompt")
-                self.console.print("[italic red]Not a valid difficulty![/italic red]\n")
+                print("Not a valid difficulty!\n")
 
     # General method for displaying a text message
     def show_message(self, key: str):
         text = self.messages.get(key)
-        text_formatted = Text.from_markup(text)
-        self.console.print(f"{text}")
+        print(f"{text}")
 
     # Displays "senses" based on sense_environment() in WumpusGame
-    def display_senses(self, sense_dict: dict) -> Panel:
+    def display_senses(self, sense_dict: dict):
+        print()
         lines = []
         if sense_dict["pit"]:
-            lines.append("You feel a [bold blue]cold breeze.[/bold blue]")
+            print("You feel a cold breeze.")
         if sense_dict["bats"]:
-            lines.append("You hear the [italic]flapping of wings...[/italic]")
+            print("You hear the flapping of wings...")
         if sense_dict["wumpus"]:
-            lines.append("You smell a [bold red]foul stench[/bold red], reminding you of Hardox!")
-
-        if lines == []:
-            lines.append("Nothing special...")
-        if lines:
-            panel = Panel("\n".join(lines), title="[bold yellow]SENSES[/bold yellow]", border_style="yellow")
-            return panel
+            print("You smell a foul stench, reminding you of Hardox!")
+        print()
     
     # Displays status of player: current room, no. of arrows, nearby rooms
-    def display_status(self, current_room_id: int, arrows: int, nearby_rooms: list) -> Panel:
+    def display_status(self, current_room_id: int, arrows: int, nearby_rooms: list):
         lines = []
         room_ids = [r.room_id for r in nearby_rooms]
         rooms_formatted = "  ".join(f"{r:>2}" for r in room_ids)
-        directions = "   N   E   S   W" # spaces for formatting under room_ids
 
-        lines.append(f"[bold white]You are in room [magenta]{current_room_id}[/magenta].[/bold white]")
-        lines.append(f"You have [bold red]{arrows} arrows[/bold red] left.")
-        lines.append(f"Nearby rooms: [bold magenta]{rooms_formatted}[/bold magenta]")
-        lines.append(f"Directions: [bold magenta]{directions}[/bold magenta]")
-
-        status_panel = Panel("\n".join(lines), title="[bold magenta]STATUS[/bold magenta]", border_style="magenta")
-        return status_panel
+        print(f"You are in room {current_room_id}.")
+        print(f"You have {arrows} arrows left.")
+        print(f"Nearby rooms: {rooms_formatted}\n")
 
     # Asks user for desired action [M]ove or [S]hoot, returns str
     def ask_action(self) -> str:
-        input_text = Text.from_markup("> Move or Shoot ([magenta]M[/magenta]/[red]S[/red]): ", style="bold white")
-        action = self.console.input(input_text).strip().upper()
+        action = str(input("> Move or Shoot [M/S]: ").strip().upper())
         self.clear_prompt("prompt")    
         return action
 
-    # Asks user for desired direction for movement, returns str
-    def ask_move_direction(self, room_id: int) -> str:
-        self.console.print(f"You are currently in room [bold magenta]{room_id}[/bold magenta].")
-        directions = f"[bold magenta][N/E/S/W][/bold magenta]"
-        input_text = Text.from_markup(f"> {directions} Direction: ", style="bold white")
-        input = str(self.console.input(input_text).upper().strip())
-        return input
+    # Asks user for desired direction for movement or aiming arrow, returns str
+    def ask_direction(self, room_id: int, move_or_shoot: str) -> str:
+        direction_to_index = {"N": 0, "E": 1, "S": 2, "W": 3} # dict for dir -> int
+        direction_strings = ["North", "East", "South", "West"]
+        choice_text = "> [N/E/S/W] Direction: "
+
+        if move_or_shoot == "move":
+            print(f"You are currently in room {room_id}.")
+        if move_or_shoot == "shoot":
+            print("Where do you want to shoot?")
+        
+        while True:
+            choice = str(input(choice_text).strip().upper())
+            if choice in direction_to_index:
+                direction = direction_to_index[choice] # turns N/E/S/W: str into 0/1/2/3: int
+                break
+            else:
+                self.show_message("invalid_direction")
+
+        if move_or_shoot == "shoot":
+            print(f"You shoot {direction_strings[direction]}")
+
+        return direction
+    
+    # Display text for arrow movement
+    def shooting_text(self, room_number: int):
+        if room_number == 1:
+            print("The arrow enters the FIRST room.\n")
+        if room_number == 2:
+            print("The arrow enters the SECOND room.\n")
+        if room_number == 3:
+            print("The arrow enters the THIRD room.\n")
+    
     
     # Shows a "moving transition" in the terminal based on movement type
     def show_move_transition(self, new_room_id: int, move_or_bat: str):
         # If it's a bat transport: print bat grab message
         if move_or_bat == "bat":
-            self.console.print("A [red]bat[/red] grabs you!", end="", style="bold italic white")
-            print()
+            print("A BAT grabs you!\n")
 
         # Print dots for "movement"
         for _ in range(3):
@@ -222,72 +255,50 @@ class TextUI:
             print(".", end="")
             print()
         time.sleep(0.3)
-        self.console.print(f"You are now in room [bold magenta]{new_room_id}[/bold magenta]\n", style="bold white")
+        print(f"You are now in room {new_room_id}\n")
         time.sleep(0.5)
 
-    # Asks user for a desired direction for shooting/steering arrow, returns str
-    def ask_shoot_direction(self) -> str:
-        directions = f"[bold red][N/E/S/W][/bold red]"
-        input_text = Text.from_markup(f"> {directions} Direction: ", style="bold white")
-        input = str(self.console.input(input_text).upper().strip())
-        return input
-    
-    # Display text for arrow movement
-    def shooting_text(self, room_number: int):
-        arrow = "[bold red]arrow[/bold red]"
-        if room_number == 1:
-            self.console.print(f"The {arrow} enters the first room.")
-        if room_number == 2:
-            self.console.print(f"The {arrow} enters the seconds room.")
-        if room_number == 3:
-            self.console.print(f"The {arrow} enters the third room.")
-    
     # Shows welcome title and intro text (if desired by user)
     def show_welcome(self):
-        # Title panel
-        title = Text("WUMPUS", style="bold red on black", justify="center")
-        subtitle = Text("*** Beneath Hardox... he looms. ***", style="white on black")
-        panel = Panel(
-            Align.center(Text.assemble(title, "\n", subtitle)),
-            box = box.ASCII,
-            border_style="red",
-            padding=(1, 4),
-            title="[bold bright_red]* * *[/bold bright_red]"
-        )
-        self.console.print(panel)
+        # Title text
+        title = r"""
++--------------------------------------------------------------+
+|                         W U M P U S                          |
+|                                                              |
+|                 Beneath Hardox... he looms.                  |
++--------------------------------------------------------------+
+"""
+        print(title)
 
         # "Skip intro" prompt
-        yes = "[bold green]Y[/bold green]"
-        no = "[bold red]N[/bold red]"
-        prompt = Text.from_markup(f"> SKIP INTRO? [{yes}/{no}]: ", style="bold white")
         while True:
-            skip = self.console.input(prompt).strip().upper()
+            skip = input("> SKIP INTRO? [Y/N]: ").strip().upper()
             if skip == "Y":
                 self.clear_prompt("prompt")
                 return
             if skip == "N":
                 break
             else:
-                self.console.print(Text.from_markup(f"[bold red]X[/bold red] Input must be {yes} or {no}\n", style="white"))
+                print("*** Input must be [Y] or [N]")
 
         # Intro text lines
         lines = [
-            "> You find yourself in the culverts beneath Hardox, where the gluttonous Wumpus resides.",
-            "> To avoid being eaten you have to shoot Wumpus with your bow and arrow.",
+            "> You find yourself in the culverts beneath Hardox, where the gluttonous WUMPUS resides.",
+            "> To avoid being eaten you have to shoot WUMPUS with your bow and arrow.",
             "> The culverts are all connected to a number of rooms via cramped tunnels.",
             "> You can move North, East, South, or West from one room to another.",
             "> Here lurks a number of dangers however:",
             "- Some rooms contain BOTTOMLESS PITS, and falling into one means certain death.",
             "- Others contain BATS, which will fly you to a random room of their choosing.",
-            "> In one of the rooms... lurks the mighty Wumpus.",
+            "> In one of the rooms... lurks the mighty WUMPUS.",
             "> If encountered, he will instantly gobble you up and you WILL die.",
             "> Luckily, via the SENSES DISPLAY you can feel the cold breeze of a pit nearby, or the flapping of wings...",
-            "> ...or the stench of Wumpus.",
+            "> ...or the stench of WUMPUS.",
             "> Via the STATUS BAR you can see: ",
             "- The room you are currently in",
             "- Nearby rooms.",
             "- How many arrows you have left.",
-            "X To win the game you have to shoot and kill Wumpus.",
+            "X To win the game you have to shoot and kill WUMPUS.",
             "X When you shoot an arrow it will move through THREE rooms.",
             "X You can direct the arrow's direction in each room it enters.",
             "X Be careful however! The tunnels wind in unexpected ways...",
@@ -315,27 +326,12 @@ class TextUI:
             print(".")
             time.sleep(1)
             print(".")
-            win_text = Text.from_markup("[bold green]Huzzah! The ol' Wumpus has been executed by a swift arrow! You win![/bold green]")
-            self.console.print(Panel(win_text, expand=False, border_style="green"))
+            print("Huzzah! The ol' WUMPUS has been executed by a swift arrow! You win!")
         
         # Show loss result
         elif result == "lose":
             time.sleep(1)
-            self.console.print("[bold red]Ouch! You met a grim and quite frankly embarassing fate. Better luck next time bozo![/bold red]")
-
-    # Takes senses_panel and status_panel with actions_panel and arranges them into three columns 
-    def show_panels(self, senses_panel: Panel, status_panel: Panel):
-        # Actions panel
-        actions_panel_content = (
-            "[bold white]What do you want to do?[/bold white]\n"
-            "\n"
-            "[bold magenta][M][/bold magenta] Move\n"
-            "[bold red][S][/bold red] Shoot an arrow"
-        )
-        actions_panel = Panel(actions_panel_content, expand=False, title="[bold white]ACTION[/bold white]", border_style="white",)
-
-        # Print all three panels in three columns
-        self.console.print(Columns([actions_panel, status_panel, senses_panel], equal=True))
+            print("XXX Ouch! You met a grim and quite frankly embarassing fate. Better luck next time bozo!")
 
     # General method for clearing a user prompt question, makes terminal cleaner
     def clear_prompt(self, to_clear: str):
@@ -519,20 +515,14 @@ class WumpusGame:
 
         return sense_dict
     
-    # Logic for moving the player, using ui.ask_move_direction for desired direction
+    # Logic for moving the player, using ui.ask_direction for desired direction
     def move_player(self, ui: TextUI):
-        direction_to_index = {"N": 0, "E": 1, "S": 2, "W": 3} # dict for dir -> int
         connected_rooms = self.player.current_room.connected_rooms
-
-        while True:
-            direction = ui.ask_move_direction(self.player.current_room.room_id) # returns N,E,S,W string
-            if direction in direction_to_index:
-                target_room_obj = connected_rooms[direction_to_index[direction]]
-                self.player.current_room = target_room_obj
-                ui.show_move_transition(self.player.current_room.room_id, "move") # show moving animation
-                return
-            else:
-                ui.show_message("invalid_direction")
+        direction = ui.ask_direction(self.player.current_room.room_id, "move") # returns N,E,S,W string
+        target_room_obj = connected_rooms[direction]
+        self.player.current_room = target_room_obj
+        ui.show_move_transition(self.player.current_room.room_id, "move") # show moving animation
+        return
 
     # Checks if player has entered a room with a pit
     def check_pit_kill(self, ui: TextUI):
@@ -555,8 +545,6 @@ class WumpusGame:
 
     # Logic fo shooting and steering arrows
     def shoot_arrow(self, ui: TextUI):
-        direction_to_index = {"N": 0, "E": 1, "S": 2, "W": 3} # dict for dir -> int
-
         # Early escape if no more arrows
         if self.player.arrows <= 0:
             ui.show_message("no_arrows")
@@ -565,17 +553,12 @@ class WumpusGame:
         # Decrement no. of arrows available
         self.player.arrows -= 1
 
-        # Run this code three times, once for each direction choice / steering
+        # Run this code three times, once for each direction choice / aiming
         for i in range(0, 3):
             current_arrow_room = self.player.current_room
-            while True:
-                connected_rooms = self.player.current_room.connected_rooms
-                direction = ui.ask_shoot_direction() # returns N,E,S,W string
-                if direction in direction_to_index:
-                    current_arrow_room = connected_rooms[direction_to_index[direction]]
-                    break
-                else:
-                    ui.show_message("invalid_direction")
+            connected_rooms = self.player.current_room.connected_rooms
+            direction = ui.ask_direction(None, "shoot") # returns an index for direction
+            current_arrow_room = connected_rooms[direction]
             ui.shooting_text(i + 1)
 
             # If arrow "hits" Wumpus
@@ -618,12 +601,10 @@ class WumpusGame:
 
     # Main method for playing a full turn of the game
     def play_turn(self, ui: TextUI):
-        # ui.console.clear()
         senses = ui.display_senses(self.sense_environment())
         status = ui.display_status(self.player.current_room.room_id, 
                                      self.player.arrows, 
                                      self.player.current_room.connected_rooms) 
-        ui.show_panels(senses, status)
 
         # Loop for choosing a player action
         while True:
