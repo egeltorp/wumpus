@@ -1,21 +1,21 @@
 # wumpus
 
 ### File structure
-- \_\_main__.py
-- game.py
-- io_cli.py
-- gui_cli.py
+- Wumpus.py
+- specification.py
+- wumpus.pdf
 
 ### Requirements
 - Python 3.x
 - `rich` package installed (`pip install rich`)
 
-### P-del (LAB3)
-En individuell programmeringsuppgift i Python som består av följande fyra delar.  
-Räkna med ca <ins>80 timmars arbete</ins>. 
+### Project Assignment (LAB3)
+An individual programming assignment in Python consisting of the following four parts.  
+Expect to spend about <ins>80 hours of work</ins>.  
+Time spent so far: 20 hours.  
 
-**Momenten i P-delen:**
-- **Specifikation**: En datorskrivern inlämningsuppgift för grunduppgiften av P-uppgiften.  
-- **Prototyp**: Skapa och redovisa två prototyper. Den första med fungerande klasser och tre funktioner, Den andra med alla andra klasser och funktioner.  
-- **Granskning**: Granska en annan students p-uppgift och redovisa din granskning under samma redovisningstid för p-uppgiften som du har granskat.  
-- **Slutredovisning**: Boka tid för redovisning, med specifikation, besiktningsprotokoll och granskare.  
+**Components of the Project Assignment:**
+- **Specification**: A written submission describing the basic task of the P-assignment.  
+- **Prototype**: Create and present two prototypes — the first with working classes and three functions, and the second including all remaining classes and functions.  
+- **Review**: Review another student’s P-assignment and present your review during the same presentation session as the student you reviewed.  
+- **Final presentation**: Book a time for your presentation, including your specification, inspection report, and reviewer.  
