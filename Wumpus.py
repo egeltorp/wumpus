@@ -243,7 +243,7 @@ class TextUI:
     # Asks user for a desired direction for shooting/steering arrow, returns str
     def ask_shoot_direction(self, iteration: int) -> str:
         directions = f"[bold red][N/E/S/W][/bold red]"
-        room_order = {0: "* First shot", 1: "* Curve the shot!", 2: "* Curve it again!"}
+        room_order = ["* First shot", "* Curve the shot!", "* Curve it again!"]
         self.console.print(f"{room_order[iteration]}")
         input_text = Text.from_markup(f"> {directions} Direction: ", style="bold white")
         input = str(self.console.input(input_text).upper().strip())
