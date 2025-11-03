@@ -31,6 +31,9 @@ from rich.panel import Panel
 from rich.columns import Columns
 from rich.align import Align
 
+# -- TITLE --
+import title_print as Splash
+
 # ==============================================================
 #                           M A I N
 # ==============================================================
@@ -62,6 +65,8 @@ def run_game(ui, game):
 
 # Main function initializing the program
 def main():
+    Splash.main()
+
     # Print version number
     print("\nVersion: B-grade | Rich | One-file | Nov 3rd 2025\n")
 
@@ -259,20 +264,8 @@ class TextUI:
         if room_number == 3:
             self.console.print(f"The {arrow} enters the third room.\n")
     
-    # Shows welcome title and intro text (if desired by user)
+    # Shows intro text (if desired by user)
     def show_welcome(self):
-        # Title panel
-        title = Text("WUMPUS", style="bold red on black", justify="center")
-        subtitle = Text("*** Beneath Hardox... he looms. ***", style="white on black")
-        panel = Panel(
-            Align.center(Text.assemble(title, "\n", subtitle)),
-            box = box.ASCII,
-            border_style="red",
-            padding=(1, 4),
-            title="[bold bright_red]* * *[/bold bright_red]"
-        )
-        self.console.print(panel)
-
         # "Skip intro" prompt
         yes = "[bold green]Y[/bold green]"
         no = "[bold red]N[/bold red]"
