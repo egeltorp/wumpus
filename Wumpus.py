@@ -226,8 +226,10 @@ class TextUI:
         time.sleep(0.5)
 
     # Asks user for a desired direction for shooting/steering arrow, returns str
-    def ask_shoot_direction(self) -> str:
+    def ask_shoot_direction(self, iteration: int) -> str:
         directions = f"[bold red][N/E/S/W][/bold red]"
+        room_order = {0: "* First shot", 1: "* Curve the shot!", 2: "* Curve it again!"}
+        self.console.print(f"{room_order[iteration]}")
         input_text = Text.from_markup(f"> {directions} Direction: ", style="bold white")
         input = str(self.console.input(input_text).upper().strip())
         return input
@@ -236,11 +238,11 @@ class TextUI:
     def shooting_text(self, room_number: int):
         arrow = "[bold red]arrow[/bold red]"
         if room_number == 1:
-            self.console.print(f"The {arrow} enters the first room.")
+            self.console.print(f"The {arrow} enters the first room.\n")
         if room_number == 2:
-            self.console.print(f"The {arrow} enters the seconds room.")
+            self.console.print(f"The {arrow} enters the second room.\n")
         if room_number == 3:
-            self.console.print(f"The {arrow} enters the third room.")
+            self.console.print(f"The {arrow} enters the third room.\n")
     
     # Shows welcome title and intro text (if desired by user)
     def show_welcome(self):
@@ -570,7 +572,7 @@ class WumpusGame:
             current_arrow_room = self.player.current_room
             while True:
                 connected_rooms = self.player.current_room.connected_rooms
-                direction = ui.ask_shoot_direction() # returns N,E,S,W string
+                direction = ui.ask_shoot_direction(i) # returns N,E,S,W string
                 if direction in direction_to_index:
                     current_arrow_room = connected_rooms[direction_to_index[direction]]
                     break
