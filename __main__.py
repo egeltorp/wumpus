@@ -10,7 +10,7 @@ from io_cli import TextUI
 from game import WumpusGame
 import random
 
-# PARAMETERS
+# PARAMETERS for game session
 NUM_ROOMS = 20  # no. of rooms
 PIT_RATE = 0.2  # % of rooms with PITS
 BAT_RATE = 0.3  # % of rooms with BATS
@@ -30,7 +30,7 @@ def run_game(ui, game: WumpusGame):
     # WELCOME and INTRO
     ui.show_welcome()
 
-    # RUN GAME
+    # RUN GAME TURNS UNTIL END
     while not game.is_over():
         game.play_turn(ui)
         game.check_game_state()
@@ -42,8 +42,10 @@ def run_game(ui, game: WumpusGame):
         ui.show_result("lose")
 
 def main():
+    # Initialize the TextUI interface
     ui = TextUI()
 
+    # Create a new instance of the WumpusGame
     game = WumpusGame(num_rooms = NUM_ROOMS,
                     pit_rate = PIT_RATE, 
                     bat_rate = BAT_RATE, 
@@ -52,7 +54,10 @@ def main():
                     safe_rooms = [],
                     seed = SEED)
     while True:
+        # Run the full game loop
         run_game(ui, game)
+
+        # Check if the user wants to play again, if YES: restart loop and run again
         answer = ui.console.input("[bold white]Play again? [[green]Y[/green]/[red]N[/red]]: [/bold white]\n").strip().upper()
         if answer != "Y":
             ui.console.print("[bold red]Goodbye![/bold red]\n")
