@@ -50,7 +50,7 @@ def run_game(ui, game):
     game.place_player()
 
     # RUN GAME TURNS UNTIL END
-    while not game.is_over():
+    while not game.is_over(ui):
         game.play_turn(ui)
         game.check_game_state(ui)
     
@@ -606,7 +606,7 @@ class WumpusGame:
         return "running"
     
     # Method for ending game in run_game() function
-    def is_over(self) -> bool:
+    def is_over(self, ui) -> bool:
         state = self.check_game_state(ui)
         if state == "lose":
             return True
