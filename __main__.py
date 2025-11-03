@@ -11,10 +11,10 @@ from game import WumpusGame
 import random
 
 # PARAMETERS for game session
-NUM_ROOMS = 20  # no. of rooms
-PIT_RATE = 0.2  # % of rooms with PITS
-BAT_RATE = 0.3  # % of rooms with BATS
-ARROWS = 5      # starting no. of ARROWS
+NUM_ROOMS = 20      # no. of rooms
+# PIT_RATE = 0.2    # % of rooms with PITS
+# BAT_RATE = 0.3    # % of rooms with BATS
+# ARROWS = 5          # starting no. of ARROWS
 
 # seed for random module
 SEED = random.randrange(1, 100)
@@ -45,11 +45,12 @@ def main():
     # Initialize the TextUI interface
     ui = TextUI()
 
+    # Choose difficulty, returns a dict with chosen parameters
+    params = ui.choose_difficulty()
+
     # Create a new instance of the WumpusGame
-    game = WumpusGame(num_rooms = NUM_ROOMS,
-                    pit_rate = PIT_RATE, 
-                    bat_rate = BAT_RATE, 
-                    starting_arrows = ARROWS,
+    game = WumpusGame(
+                    **params,
                     rooms = [], 
                     safe_rooms = [],
                     seed = SEED)

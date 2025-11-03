@@ -12,7 +12,7 @@ import time
 from rich.console import Console
 from rich.table import Table
 from rich.text import Text
-from rich.prompt import Prompt
+from rich import box
 from rich.panel import Panel
 from rich.columns import Columns
 from rich.align import Align
@@ -31,6 +31,52 @@ class TextUI:
             "invalid_action": "[bold red]Not a valid action.[/bold red]\n",
             "suicide": "[bold red]You killed yourself with the arrow.[/bold red]\n"
         }
+    
+    def choose_difficulty(self):
+        # Easy difficulty, easier than standard parameters
+        e_dict = {"num_rooms": 15, "pit_rate": 0.1, "bat_rate": 0.2, "starting_arrows": 6}
+        easy_text = Text.from_markup("Rooms: 15\nPits: 10%\nBats: 20%\nArrows: 6", justify="center")
+        easy_panel = Panel(easy_text, title="[bold green]EASY [E][/bold green]", border_style="green", padding=(1,2))
+
+        # Normal difficulty, standard Assignment parameters
+        n_dict = {"num_rooms": 20, "pit_rate": 0.2, "bat_rate": 0.3, "starting_arrows": 5}
+        normal_text = Text.from_markup("Rooms: 20\nPits: 20%\nBats: 30%\nArrows: 5", justify="center")
+        normal_panel = Panel(normal_text, title="[bold yellow]NORMAL [N][/bold yellow]", border_style="yellow", padding=(1,2))
+
+        # Hard difficulty, very difficult, more rooms, less arrows
+        h_dict = {"num_rooms": 30, "pit_rate": 0.25, "bat_rate": 0.35, "starting_arrows": 3}
+        hard_text = Text.from_markup("Rooms: 30\nPits: 25%\nBats: 35%\nArrows: 3", justify="center")
+        hard_panel = Panel(hard_text, title="[bold red]HARDOX [H][/bold red]", border_style="red", padding=(1,2))
+
+        # Arrange difficulty panels in a nice 3 column row of panels
+        columns = Columns([easy_panel, normal_panel, hard_panel], expand=True)
+
+        # Display columns in one panel
+        main_panel = Panel(columns, title="[bold white]DIFFICULTIES[/bold white]", box=box.SIMPLE_HEAD, border_style="white", padding=(1,1))
+        self.console.print(main_panel)
+
+        # Ask for difficulty choice
+        E = "[bold green]E[/bold green]"
+        N = "[bold yellow]N[/bold yellow]"
+        H = "[bold red]H[/bold red]"
+        while True:
+            choice_text = Text.from_markup(f"Choose a difficulty [{E}/{N}/{H}]: ", style="bold white")
+            choice = self.console.input(choice_text).strip().upper()
+            if choice == "E":
+                self.clear_prompt("prompt")
+                self.console.print("You chose [bold green]EASY[/bold green]")
+                return e_dict
+            if choice == "N":
+                self.clear_prompt("prompt")
+                self.console.print("You chose [bold yellow]NORMAL[/bold yellow]")
+                return n_dict
+            if choice == "H":
+                self.clear_prompt("prompt")
+                self.console.print("You chose [bold red]HARD[/bold red]")
+                return h_dict
+            else:
+                self.clear_prompt("prompt")
+                self.console.print("[italic red]Not a valid difficulty![/italic red]\n")
 
     def show_message(self, key):
         text = self.messages.get(key)
@@ -116,6 +162,7 @@ class TextUI:
         subtitle = Text("*** Beneath Hardox... he looms. ***", style="white on black")
         panel = Panel(
             Align.center(Text.assemble(title, "\n", subtitle)),
+            box = box.ASCII,
             border_style="red",
             padding=(1, 4),
             title="[bold bright_red]* * *[/bold bright_red]"
