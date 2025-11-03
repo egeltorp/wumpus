@@ -144,6 +144,23 @@ class WumpusGame:
             else:
                 ui.show_message("invalid_direction")
 
+    def check_pit_kill(self, ui):
+        if self.player.current_room.has_pit:
+            ui.show_message("pit_fall")
+            self.player.is_alive = False
+
+    def check_bats_transport(self, ui) -> bool:
+        if self.player.current_room.has_bats:
+            possible_rooms = [room for room in self.safe_rooms if room != self.player.current_room]
+            self.player.current_room = random.choice(possible_rooms)
+            ui.show_move_transition(self.player.current_room.room_id, "bat")
+        return False
+    
+    def check_wumpus_encounter(self, ui) -> bool:
+        if self.player.current_room.has_wumpus:
+            ui.show_message("wumpus_attack")
+            self.player.is_alive = False
+
     def shoot_arrow(self, ui):
         self.player.arrows -= 1
         direction_to_index = {"N": 0, "E": 1, "S": 2, "W": 3}
@@ -171,23 +188,6 @@ class WumpusGame:
                 self.player.is_alive = False
                 return
         ui.show_message("arrow_miss")
-
-    def check_pit_kill(self, ui):
-        if self.player.current_room.has_pit:
-            ui.show_message("pit_fall")
-            self.player.is_alive = False
-
-    def check_bats_transport(self, ui) -> bool:
-        if self.player.current_room.has_bats:
-            possible_rooms = [room for room in self.safe_rooms if room != self.player.current_room]
-            self.player.current_room = random.choice(possible_rooms)
-            ui.show_move_transition(self.player.current_room.room_id, "bat")
-        return False
-    
-    def check_wumpus_encounter(self, ui) -> bool:
-        if self.player.current_room.has_wumpus:
-            ui.show_message("wumpus_attack")
-            self.player.is_alive = False
 
     def check_game_state(self) -> str:
         # if player is dead, they lose
