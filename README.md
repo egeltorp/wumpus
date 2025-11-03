@@ -1,4 +1,6 @@
 # wumpus
+### Version
+B-grade | Rich | One-file | Nov 2025
 
 ### File structure
 - Wumpus.py
