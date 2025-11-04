@@ -1,7 +1,7 @@
 '''
 Wumpus.py
 --------
-Version: Legacy UI | B-grade | Print | One-file | Nov 4th 2025
+Version: Wumpus GUI | A-grade | Tkinter | One-file | Nov 4th 2025
 * Choose difficulty
 * Wumpus chases on HARD
 * One file for all code
@@ -15,6 +15,10 @@ import sys
 import time
 from collections import deque
 
+# --- TKINTER ---
+import tkinter as tk
+from tkinter import messagebox
+
 # ==============================================================
 #                           M A I N
 # ==============================================================
@@ -22,9 +26,28 @@ from collections import deque
 # Handles init, difficulty selection, and main loop
 # ==============================================================
 
-# PARAMETERS
-SEED = random.randrange(1, 1000)
+# Main function initializing the program
+def main():
+    # Print version number
+    print("\nVersion: GUI | A-grade | Print | One-file | Nov 2025\n")
 
+    # Initialize the GUI interface
+    ui = GUI()
+    ui.run()
+
+    # Skip intro or not
+
+    # Choose difficulty, returns a dict with chosen parameters
+    # params = ui.choose_difficulty()
+
+    # Create a new instance of the WumpusGame
+    # game = WumpusGame(**params)
+
+    # Run the full game loop
+
+    # Check if the user wants to play again, if YES: restart loop and run again
+
+# ------------------------------- MISSING COMMENT
 def run_game(ui, game):
     # SETUP
     game.random_seed()
@@ -44,60 +67,42 @@ def run_game(ui, game):
     if game.check_game_state(ui) == "lose":
         ui.show_result("lose")
 
-# Main function initializing the program
-def main():
-    # Print version number
-    print("\nVersion: Legacy | B-grade | Print | One-file | Nov 3rd 2025\n")
-
-    # Initialize the GUI interface
-    ui = GUI()
-
-    # Show Welcome and Intro-text
-    ui.show_welcome()
-
-    while True:
-        # Choose difficulty, returns a dict with chosen parameters
-        params = ui.choose_difficulty()
-
-        # Create a new instance of the WumpusGame
-        game = WumpusGame(**params, seed = SEED)
-
-        # Run the full game loop
-        run_game(ui, game)
-
-        # Check if the user wants to play again, if YES: restart loop and run again
-        answer = input("> Play again? [Y/N]: \n").strip().upper()
-        if answer != "Y":
-            print("Goodbye!\n")
-            break
-
 # ==============================================================
 #                             G U I
 # ==============================================================
 # Handles player input/output, uses tkinter for UI
 # Provides menus, messages, status, player interaction
 # ==============================================================
-# Class for GUI interfaces, input/output
+# Class for GUI interfaces, input/output, uses tkinter
 class GUI:
     def __init__(self):
-        self.messages = {
-            "no_arrows": "You have no arrows left!\n",
-            "arrow_miss": "Your arrow missed.\n",
-            "wumpus_attack": "The Wumpus slobbers on your flesh!\n",
-            "wumpus_move": "The Wumpus stomps CLOSER!\n",
-            "wumpus_hit": "The Wumpus has been STRUCK!\n",
-            "pit_fall": "You tripped into a bottomless PIT like a buffoon...\n",
-            "invalid_direction": "NOT a valid direction.\n",
-            "invalid_action": "NOT a valid action.\n",
-            "suicide": "You KILLED YOURSELF with the arrow.\n",
-            "pit": "You feel a cold breeze.",
-            "bats": "You hear the flapping of wings...",
-            "stench": "You smell a FOUL STENCH, reminding you of Hardox!",
-            "death": "Ouch! You met a grim and quite frankly embarassing fate. Better luck next time bozo!",
-            "easy": "You chose EASY",
-            "normal": "You chose NORMAL",
-            "hard": "You chose HARD",
-        }
+        self.root = tk.Tk()
+        self.root.title("Wumpus GUI")
+        self.root.geometry('800x600+50+50')
+        self.root.configure(bg="#000000")
+        self.font = "Menlo"
+        self.black = "#000000"
+        self.white = "#E5E5E5"
+
+        # Title
+        title = tk.Label(self.root, text="Wumpus GUI", font=(self.font, 16, "bold"), bg=self.black, fg=self.white)
+        title.pack(pady=10)
+
+        self.game_layout()
+
+    def run(self):
+        self.root.mainloop()
+
+    def game_layout(self):
+        # Info Panels
+        info_frame = tk.Frame(self.root, bg="#000000")
+        info_frame.pack(fill="x", padx=10, pady=5)
+
+        self.senses_label = tk.Label(info_frame, text="SENSES: None", anchor="w", bg=self.black, fg="#FFF200", font=(self.font, 16))
+        self.senses_label.pack(fill="x", padx=10, pady=2)
+
+        self.status_label = tk.Label(info_frame, text="STATUS:", anchor="w", bg=self.black, fg="#AA00AA", font=(self.font, 16))
+        self.status_label.pack(fill="x", padx=10, pady=2)
 
     # Displays the difficulty levels in neat columns
     def display_difficulties(self):
@@ -383,20 +388,19 @@ class Player:
         self.is_alive = True
 
 # Class for the WumpusGame object and all game logic methods
+
 class WumpusGame:
     def __init__(self, 
                  num_rooms: int = 16, 
                  pit_rate: float = 0.2, 
                  bat_rate: float = 0.3,
                  starting_arrows: int = 5,
-                 wumpus_chases: bool = False,
-                 seed: int = 1701):
+                 wumpus_chases: bool = False):
         self.num_rooms = num_rooms
         self.pit_rate = pit_rate
         self.bat_rate = bat_rate
         self.starting_arrows = starting_arrows
         self.wumpus_chases = wumpus_chases
-        self.seed = seed
         self.rooms = []
         self.safe_rooms = []
         self.state = "running"
@@ -404,7 +408,8 @@ class WumpusGame:
 
     # Assigns a seed for the random module for reproducability
     def random_seed(self):
-        random.seed(self.seed)
+        SEED = random.randrange(1, 1000)
+        random.seed(SEED)
 
     # Generates a list of rooms based on self.num_rooms
     def generate_rooms(self):
@@ -650,3 +655,35 @@ class WumpusGame:
 # Runs the game if program is run NOT as an imported module
 if __name__ == "__main__":
     main()
+
+messages = {
+    "no_arrows": "You have no arrows left!\n",
+    "arrow_miss": "Your arrow missed.\n",
+    "wumpus_attack": "The Wumpus slobbers on your flesh!\n",
+    "wumpus_move": "The Wumpus stomps CLOSER!\n",
+    "wumpus_hit": "The Wumpus has been STRUCK!\n",
+    "pit_fall": "You tripped into a bottomless PIT like a buffoon...\n",
+    "invalid_direction": "NOT a valid direction.\n",
+    "invalid_action": "NOT a valid action.\n",
+    "suicide": "You KILLED YOURSELF with the arrow.\n",
+    "pit": "You feel a cold breeze.",
+    "bats": "You hear the flapping of wings...",
+    "stench": "You smell a FOUL STENCH, reminding you of Hardox!",
+    "death": "Ouch! You met a grim and quite frankly embarassing fate. Better luck next time bozo!",
+    "easy": "You chose EASY",
+    "normal": "You chose NORMAL",
+    "hard": "You chose HARD",
+}
+
+'''
+| Name    | Hex       
+| ------- | --------- 
+| black   | `#000000` 
+| red     | `#AA0000` 
+| green   | `#00AA00` 
+| yellow  | `#AA5500` 
+| blue    | `#0000AA` 
+| magenta | `#AA00AA` 
+| cyan    | `#00AAAA` 
+| white   | `#AAAAAA`
+'''

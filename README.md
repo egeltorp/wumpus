@@ -1,7 +1,7 @@
 # wumpus (Tkinter GUI)
 
 ### Version
-Tkinter GUI | A-grade | Print | One-file | Nov 2025
+GUI | A-grade | Tkinter | One-file | Nov 2025
 
 ### File structure
 - Wumpus_GUI.py
@@ -10,6 +10,7 @@ Tkinter GUI | A-grade | Print | One-file | Nov 2025
 ### Requirements
 - Python 3.x
 - tkinter
+- 'Menlo' font
 
 ### Project Assignment (LAB3)
 An individual programming assignment in Python consisting of the following four parts.  
