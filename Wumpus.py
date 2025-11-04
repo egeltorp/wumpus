@@ -282,27 +282,27 @@ class TextUI:
 
         # Intro text lines
         lines = [
-            "> You find yourself in the culverts beneath Hardox, where the gluttonous Wumpus resides.",
-            "> To avoid being eaten you have to shoot Wumpus with your bow and arrow.",
+            "> You find yourself in the culverts beneath Hardox, where the gluttonous WUMPUS resides.",
+            "> To avoid being eaten you have to shoot WUMPUS with your bow and arrow.",
             "> The culverts are all connected to a number of rooms via cramped tunnels.",
             "> You can move North, East, South, or West from one room to another.",
             "> Here lurks a number of dangers however:",
             "- Some rooms contain BOTTOMLESS PITS, and falling into one means certain death.",
             "- Others contain BATS, which will fly you to a random room of their choosing.",
-            "> In one of the rooms... lurks the mighty Wumpus.",
+            "> In one of the rooms... lurks the mighty WUMPUS.",
             "> If encountered, he will instantly gobble you up and you WILL die.",
             "> Luckily, via the SENSES DISPLAY you can feel the cold breeze of a pit nearby, or the flapping of wings...",
-            "> ...or the stench of Wumpus.",
+            "> ...or the stench of WUMPUS.",
             "> Via the STATUS BAR you can see: ",
             "- The room you are currently in",
             "- Nearby rooms.",
             "- How many arrows you have left.",
-            "X To win the game you have to shoot and kill Wumpus.",
+            "X You have a bow and arrows.",
+            "X To win the game you have to shoot and kill WUMPUS.",
             "X When you shoot an arrow it will move through THREE rooms.",
             "X You can direct the arrow's direction in each room it enters.",
             "X Be careful however! The tunnels wind in unexpected ways...",
             "X You might shoot yourself! Bozo.",
-            "X You have FIVE arrows.",
             "> Qapla' and good luck!"
         ]
 
