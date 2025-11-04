@@ -1,5 +1,5 @@
 '''
-Wumpus.py
+Wumpus_GUI.py
 --------
 Version: Wumpus GUI | A-grade | Tkinter | One-file | Nov 4th 2025
 * Choose difficulty
@@ -22,76 +22,83 @@ from tkinter import messagebox
 # ==============================================================
 #                           M A I N
 # ==============================================================
-# Entry point for Hunt the Wumpus
-# Handles init, difficulty selection, and main loop
-# ==============================================================
 
 # Main function initializing the program
 def main():
     # Print version number
-    print("\nVersion: GUI | A-grade | Print | One-file | Nov 2025\n")
+    print("\nVersion: Wumpus GUI | A-grade | Tkinter | One-file | Nov 2025\n")
 
-    # Initialize the GUI interface
+    # Initialize the GUI interface + run tkinter mainloop
     ui = GUI()
     ui.run()
 
     # Skip intro or not
 
     # Choose difficulty, returns a dict with chosen parameters
-    # params = ui.choose_difficulty()
+    params = ui.choose_difficulty()
 
-    # Create a new instance of the WumpusGame
-    # game = WumpusGame(**params)
+    # Create a new instance of the WumpusGame and set up game environment
+    game = WumpusGame(**params)
 
-    # Run the full game loop
+    # Run the full game
 
     # Check if the user wants to play again, if YES: restart loop and run again
-
-# ------------------------------- MISSING COMMENT
-def run_game(ui, game):
-    # SETUP
-    game.random_seed()
-    game.generate_rooms()
-    game.connect_rooms()
-    game.place_hazards()
-    game.place_player()
-
-    # RUN GAME TURNS UNTIL END
-    while not game.is_over(ui):
-        game.play_turn(ui)
-        game.check_game_state(ui)
-    
-    # SHOW RESULT AFTER GAME ENDED
-    if game.check_game_state(ui) == "win":
-        ui.show_result("win")
-    if game.check_game_state(ui) == "lose":
-        ui.show_result("lose")
 
 # ==============================================================
 #                             G U I
 # ==============================================================
-# Handles player input/output, uses tkinter for UI
-# Provides menus, messages, status, player interaction
+# Handles player input and game layout, uses tkinter for UI
+# Provides menus, messages, player interaction and status
 # ==============================================================
-# Class for GUI interfaces, input/output, uses tkinter
+
+# Class for GUI interfaces, uses tkinter
 class GUI:
     def __init__(self):
+        # Window setup
         self.root = tk.Tk()
         self.root.title("Wumpus GUI")
         self.root.geometry('800x600+50+50')
         self.root.configure(bg="#000000")
-        self.font = "Menlo"
+        self.root.protocol("WM_DELETE_WINDOW", self.on_close)
+
+        # Tuple arguments for labels
+        self.font_title = ("Menlo", 22, "bold")
+        self.font_subtitle = ("Menlo", 16, "bold")
+        self.font_text = ("Menlo", 12)
+
+        # String arguments for colors
         self.black = "#000000"
         self.white = "#E5E5E5"
+        self.debug = "#FF0000"
 
         # Title
-        title = tk.Label(self.root, text="Wumpus GUI", font=(self.font, 16, "bold"), bg=self.black, fg=self.white)
+        # title = tk.Label(self.root, text="Wumpus GUI", font=(self.font, 16, "bold"), bg=self.black, fg=self.white)
+        # title.pack(pady=10)
+
+        # Game starts with intro
+        self.intro()
+
+    def intro(self):
+        # Welcome
+        title = tk.Label(self.root, text="Welcome to Wumpus", font=self.font_title, bg=self.debug, fg=self.white)
         title.pack(pady=10)
 
-        self.game_layout()
+        # Prompt
+        prompt = tk.Label(self.root, text="> Choose a difficulty level", font=self.font_subtitle, bg=self.debug, fg=self.white)
+        prompt.pack(pady=10)
 
-    def run(self):
-        self.root.mainloop()
+        # Frame for buttons
+        frame = tk.Frame(bg='lightblue', bd=3, cursor='hand2', height=150, width=200, highlightcolor='red', highlightthickness=2, highlightbackground='black', relief=tk.RAISED)
+        frame.pack(pady=10)
+
+
+        pass
+
+    def choose_difficulty(self):
+        easy_dict = {"num_rooms": 15, "pit_rate": 0.1, "bat_rate": 0.2, "starting_arrows": 6, "wumpus_chases": False}
+        normal_dict = {"num_rooms": 20, "pit_rate": 0.2, "bat_rate": 0.3, "starting_arrows": 5, "wumpus_chases": False}
+        hard_dict = {"num_rooms": 30, "pit_rate": 0.25, "bat_rate": 0.35, "starting_arrows": 3, "wumpus_chases": True}
+        pass
 
     def game_layout(self):
         # Info Panels
@@ -130,60 +137,6 @@ Arrows: 3
 Wumpus will CHASE you!
 """
 
-        # Split each difficulty into lines and pad nicely
-        col1 = easy.strip().splitlines()
-        col2 = normal.strip().splitlines()
-        col3 = hard.strip().splitlines()
-
-        # Calc max no. of lines and pad
-        max_lines = max(len(col1), len(col2), len(col3))
-        col1 += [""] * (max_lines - len(col1))
-        col2 += [""] * (max_lines - len(col2))
-        col3 += [""] * (max_lines - len(col3))
-        padding = 6
-
-        # Print columns (using no rich module!! Impressive right...?)
-        for a, b, c in zip(col1, col2, col3):
-            print(f"{a:<20}{' ' * padding}{b:<20}{' ' * padding}{c:<20}")
-
-    # User chooses difficulty with input letter [E/N/H]
-    def choose_difficulty(self) -> dict:
-        # Display all difficulty levels
-        self.display_difficulties()
-
-        # Easy difficulty, easier than standard parameters
-        easy_dict = {"num_rooms": 15, "pit_rate": 0.1, "bat_rate": 0.2, "starting_arrows": 6, "wumpus_chases": False}
-
-        # Normal difficulty, standard Assignment parameters
-        normal_dict = {"num_rooms": 20, "pit_rate": 0.2, "bat_rate": 0.3, "starting_arrows": 5, "wumpus_chases": False}
-
-        # Hard difficulty, very difficult, more rooms, less arrows
-        hard_dict = {"num_rooms": 30, "pit_rate": 0.25, "bat_rate": 0.35, "starting_arrows": 3, "wumpus_chases": True}
-        
-
-        # Ask for difficulty choice
-        while True:
-            choice_text = "\n> Choose a difficulty [E/N/H]: "
-            choice = str(input(choice_text).strip().upper())
-            if choice == "E":
-                self.clear_prompt("prompt")
-                self.show_message("easy", "action")
-                time.sleep(1)
-                return easy_dict
-            if choice == "N":
-                self.clear_prompt("prompt")
-                self.show_message("normal", "action")
-                time.sleep(1)
-                return normal_dict
-            if choice == "H":
-                self.clear_prompt("prompt")
-                self.show_message("hard", "action")
-                time.sleep(1)
-                return hard_dict
-            else:
-                self.clear_prompt("prompt")
-                self.show_message("Not a valid difficulty!\n", "invalid")
-
     # General method for displaying a text message
     def show_message(self, key: str, type: str):
         # Get message to show
@@ -202,18 +155,6 @@ Wumpus will CHASE you!
             print(f"!!! {text}")
         if type == "invalid":
             print(f"XXX {text}")
-
-    # Displays "senses" based on sense_environment() in WumpusGame
-    def display_senses(self, sense_dict: dict):
-        print()
-        lines = []
-        if sense_dict["pit"]:
-            self.show_message("pit", "warn")
-        if sense_dict["bats"]:
-            self.show_message("bats", "warn")
-        if sense_dict["wumpus"]:
-            self.show_message("stench", "warn")
-        print()
     
     # Displays status of player: current room, no. of arrows, nearby rooms
     def display_status(self, current_room_id: int, arrows: int, nearby_rooms: list):
@@ -228,7 +169,6 @@ Wumpus will CHASE you!
     # Asks user for desired action [M]ove or [S]hoot, returns str
     def ask_action(self) -> str:
         action = str(input("> Move or Shoot [M/S]: ").strip().upper())
-        self.clear_prompt("prompt")    
         return action
 
     # Asks user for desired direction for movement or aiming arrow, returns str
@@ -284,27 +224,6 @@ Wumpus will CHASE you!
 
     # Shows welcome title and intro text (if desired by user)
     def show_welcome(self):
-        # Title text
-        title = r"""
-+--------------------------------------------------------------+
-|                         W U M P U S                          |
-|                                                              |
-|                 Beneath Hardox... he looms.                  |
-+--------------------------------------------------------------+
-"""
-        print(title)
-
-        # "Skip intro" prompt
-        while True:
-            skip = input("> SKIP INTRO? [Y/N]: ").strip().upper()
-            if skip == "Y":
-                self.clear_prompt("prompt")
-                return
-            if skip == "N":
-                break
-            else:
-                print("*** Input must be [Y] or [N]")
-
         # Intro text lines
         lines = [
             "> You find yourself in the culverts beneath Hardox, where the gluttonous WUMPUS resides.",
@@ -357,12 +276,17 @@ Wumpus will CHASE you!
             time.sleep(1)
             self.show_message("death", "event")
 
-    # General method for clearing a user prompt question, makes terminal cleaner
-    def clear_prompt(self, to_clear: str):
-        if to_clear == "prompt":
-            sys.stdout.write("\033[F")
-            sys.stdout.write("\033[K")
-            sys.stdout.flush()
+    def run(self):
+        self.root.mainloop()
+
+    def clear(self):
+        for widget in self.root.wininfo_children():
+            widget.destroy()
+
+    def on_close(self):
+        print("Closing game...")
+        self.root.destroy()
+        sys.exit(0)
 
 # ==============================================================
 #                         G A M E   L O G I C
@@ -405,6 +329,13 @@ class WumpusGame:
         self.safe_rooms = []
         self.state = "running"
         self.wumpus_room: Room = None
+
+        # SETUP
+        self.random_seed()
+        self.generate_rooms()
+        self.connect_rooms()
+        self.place_hazards()
+        self.place_player()
 
     # Assigns a seed for the random module for reproducability
     def random_seed(self):
@@ -622,7 +553,7 @@ class WumpusGame:
             return True
         elif state == "running":
             return False
-
+        
     # Main method for playing a full turn of the game
     def play_turn(self, ui: GUI):
         senses = ui.display_senses(self.sense_environment())
