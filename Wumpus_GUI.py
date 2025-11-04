@@ -1,10 +1,11 @@
 '''
 Wumpus_GUI.py
 --------
-Version: Wumpus GUI | A-grade | Tkinter | One-file | Nov 4th 2025
+Version: Wumpus GUI | A-grade | Tkinter | One-file | Nov 2025
 * Choose difficulty
 * Wumpus chases on HARD
 * One file for all code
+* Based on Wumpus Legacy Version Nov 4th 2025
 --------
 Theodor Holmberg aka @egeltorp 2025
 '''
@@ -25,20 +26,16 @@ from tkinter import messagebox
 
 # Main function initializing the program
 def main():
-    # Print version number
-    print("\nVersion: Wumpus GUI | A-grade | Tkinter | One-file | Nov 2025\n")
+    print("\nVersion: Wumpus GUI | A-grade | Tkinter | One-file | Nov 2025\n") # Print version number
 
     # Initialize the GUI interface + run tkinter mainloop
     ui = GUI()
     ui.run()
 
     # Skip intro or not
-
-    # Choose difficulty, returns a dict with chosen parameters
-    params = ui.choose_difficulty()
-
-    # Create a new instance of the WumpusGame and set up game environment
-    game = WumpusGame(**params)
+    
+    params = ui.choose_difficulty() # Choose difficulty, returns a dict with chosen parameters
+    game = WumpusGame(**params) # Create a new instance of the WumpusGame and set up game environment
 
     # Run the full game
 
@@ -57,7 +54,7 @@ class GUI:
         # Window setup
         self.root = tk.Tk()
         self.root.title("Wumpus GUI")
-        self.root.geometry('800x600+50+50')
+        self.root.geometry("800x600+800+325")
         self.root.configure(bg="#000000")
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
 
@@ -66,39 +63,48 @@ class GUI:
         self.font_subtitle = ("Menlo", 16, "bold")
         self.font_text = ("Menlo", 12)
 
-        # String arguments for colors
-        self.black = "#000000"
-        self.white = "#E5E5E5"
-        self.debug = "#FF0000"
-
-        # Title
-        # title = tk.Label(self.root, text="Wumpus GUI", font=(self.font, 16, "bold"), bg=self.black, fg=self.white)
-        # title.pack(pady=10)
+        # Padding variables
+        self.pady_title = {"pady": (100, 20)}
 
         # Game starts with intro
         self.intro()
 
     def intro(self):
         # Welcome
-        title = tk.Label(self.root, text="Welcome to Wumpus", font=self.font_title, bg=self.debug, fg=self.white)
-        title.pack(pady=10)
+        title = tk.Label(self.root, text="Welcome to Wumpus", font=self.font_title, bg="black", fg="white")
+        title.pack(**self.pady_title)
 
         # Prompt
-        prompt = tk.Label(self.root, text="> Choose a difficulty level", font=self.font_subtitle, bg=self.debug, fg=self.white)
+        prompt = tk.Label(self.root, text="> Would you like to SKIP the INTRO?", font=self.font_subtitle, bg="black", fg="white")
+        prompt.pack(pady=10)
+
+        # Skip / Continue
+        skip = tk.Button(self.root, text="SKIP", font=self.font_subtitle, bg="black", fg="white", width="20", command=self.choose_difficulty)
+        skip.pack(pady=(100, 20))
+        cont = tk.Button(self.root, text="CONTINUE", font=self.font_subtitle, bg="black", fg="white", width="20", command=self.start_intro)
+        cont.pack(pady=(0, 20))
+
+    def start_intro(self):
+        self.clear() # Clears the previous tk layout
+        title = tk.Label(self.root, text="Instructions", font=self.font_title, bg="black", fg="white")
+        title.pack(**self.pady_title)
+
+    def choose_difficulty(self):
+        self.clear()
+        
+        title = tk.Label(self.root, text="DIFFICULTY", font=self.font_title, bg="black", fg="white")
+        title.pack(**self.pady_title)
+
+        prompt = tk.Label(self.root, text="> Choose a difficulty level", font=self.font_subtitle, bg="black", fg="white")
         prompt.pack(pady=10)
 
         # Frame for buttons
-        frame = tk.Frame(bg='lightblue', bd=3, cursor='hand2', height=150, width=200, highlightcolor='red', highlightthickness=2, highlightbackground='black', relief=tk.RAISED)
-        frame.pack(pady=10)
+        frame = tk.Frame(self.root, bg="black")
+        frame.pack(pady=50)
 
-
-        pass
-
-    def choose_difficulty(self):
         easy_dict = {"num_rooms": 15, "pit_rate": 0.1, "bat_rate": 0.2, "starting_arrows": 6, "wumpus_chases": False}
         normal_dict = {"num_rooms": 20, "pit_rate": 0.2, "bat_rate": 0.3, "starting_arrows": 5, "wumpus_chases": False}
         hard_dict = {"num_rooms": 30, "pit_rate": 0.25, "bat_rate": 0.35, "starting_arrows": 3, "wumpus_chases": True}
-        pass
 
     def game_layout(self):
         # Info Panels
@@ -276,13 +282,16 @@ Wumpus will CHASE you!
             time.sleep(1)
             self.show_message("death", "event")
 
+    # Runs tk mainloop to listen for player input
     def run(self):
         self.root.mainloop()
 
+    # Helper method for clearing the current tk layout
     def clear(self):
-        for widget in self.root.wininfo_children():
+        for widget in self.root.winfo_children():
             widget.destroy()
 
+    # Exits the .py program on window close
     def on_close(self):
         print("Closing game...")
         self.root.destroy()
