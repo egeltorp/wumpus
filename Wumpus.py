@@ -18,7 +18,7 @@ from collections import deque
 # ==============================================================
 #                           M A I N
 # ==============================================================
-# Entry point for Hunt the Wumpus
+# Entry point for Wumpus
 # Handles init, difficulty selection, and main loop
 # ==============================================================
 
