@@ -20,4 +20,9 @@ Time spent so far: 20 hours.
 - **Specification**: A written submission describing the basic task of the P-assignment.  
 - **Prototype**: Create and present two prototypes — the first with working classes and three functions, and the second including all remaining classes and functions.  
 - **Review**: Review another student’s P-assignment and present your review during the same presentation session as the student you reviewed.  
-- **Final presentation**: Book a time for your presentation, including your specification, inspection report, and reviewer.  
+- **Final presentation**: Book a time for your presentation, including your specification, inspection report, and reviewer.
+
+### Screenshots
+<img width="630" height="500" alt="wumpus" src="https://github.com/user-attachments/assets/257da941-eaa5-4652-9588-35f7f049e19e" />  
+
+<img width="2137" height="1555" alt="image" src="https://github.com/user-attachments/assets/d749c78d-edbf-4c37-bc59-7892b694f903" />  
