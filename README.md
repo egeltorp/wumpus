@@ -15,7 +15,9 @@ GUI | A-grade | Tkinter | One-file | Nov 2025
 ### Project Assignment (LAB3)
 An individual programming assignment in Python consisting of the following four parts.  
 Expect to spend about <ins>80 hours of work</ins>.  
-Time spent so far: 20 hours.  
+Time spent on the GUI Version:  
+Session 1: 6h ---> 04-11-2025, 19:00 > 05-11-2025, 01:00
+
 
 **Components of the Project Assignment:**
 - **Specification**: A written submission describing the basic task of the P-assignment.  
