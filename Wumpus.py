@@ -37,7 +37,7 @@ import title_print as Splash
 # ==============================================================
 #                           M A I N
 # ==============================================================
-# Entry point for Hunt the Wumpus
+# Entry point for Wumpus
 # Handles init, difficulty selection, and main loop
 # ==============================================================
 
