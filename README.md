@@ -1,15 +1,15 @@
-# wumpus (Legacy UI)
+# wumpus (Tkinter GUI)
 
 ### Version
-Legacy UI | B-grade | Print | One-file | Nov 4th 2025
+Tkinter GUI | A-grade | Print | One-file | Nov 2025
 
 ### File structure
-- Wumpus.py
-- specification.py
+- Wumpus_GUI.py
 - wumpus.pdf
 
 ### Requirements
 - Python 3.x
+- tkinter
 
 ### Project Assignment (LAB3)
 An individual programming assignment in Python consisting of the following four parts.  

@@ -49,8 +49,8 @@ def main():
     # Print version number
     print("\nVersion: Legacy | B-grade | Print | One-file | Nov 3rd 2025\n")
 
-    # Initialize the TextUI interface
-    ui = TextUI()
+    # Initialize the GUI interface
+    ui = GUI()
 
     # Show Welcome and Intro-text
     ui.show_welcome()
@@ -72,13 +72,13 @@ def main():
             break
 
 # ==============================================================
-#                        T E X T   U I
+#                             G U I
 # ==============================================================
-# Handles console input/output, Python print for legacy styling
+# Handles player input/output, uses tkinter for UI
 # Provides menus, messages, status, player interaction
 # ==============================================================
-# Class for TextUI interfaces, input/output
-class TextUI:
+# Class for GUI interfaces, input/output
+class GUI:
     def __init__(self):
         self.messages = {
             "no_arrows": "You have no arrows left!\n",
@@ -461,7 +461,7 @@ class WumpusGame:
         self.safe_rooms = [room for room in self.rooms if not room.has_pit and not room.has_bats and not room.has_wumpus]
 
     # Wumpus movement logic, uses helper method for pathfinding and moves Wumpus closer to player
-    def wumpus_chase(self, ui: TextUI):
+    def wumpus_chase(self, ui: GUI):
         # If wumpus_chases is true: get closeer to player each turn
         if self.wumpus_chases == True:
             self.wumpus_room.has_wumpus = False # Remove old has_wumpus flag
@@ -535,7 +535,7 @@ class WumpusGame:
         return sense_dict
     
     # Logic for moving the player, using ui.ask_direction for desired direction
-    def move_player(self, ui: TextUI):
+    def move_player(self, ui: GUI):
         connected_rooms = self.player.current_room.connected_rooms
         direction = ui.ask_direction(self.player.current_room.room_id, "move") # returns N,E,S,W string
         target_room_obj = connected_rooms[direction]
@@ -544,7 +544,7 @@ class WumpusGame:
         return
 
     # Checks if player has entered a room with a pit
-    def check_pit_kill(self, ui: TextUI):
+    def check_pit_kill(self, ui: GUI):
         if self.player.current_room.has_pit:
             ui.show_message("pit_fall", "event")
             self.player.is_alive = False
@@ -557,13 +557,13 @@ class WumpusGame:
             ui.show_move_transition(self.player.current_room.room_id, "bat")
     
     # Checks for player encounter with Wumpus, changes alive-status of Player instance
-    def check_wumpus_encounter(self, ui: TextUI):
+    def check_wumpus_encounter(self, ui: GUI):
         if self.player.current_room.has_wumpus:
             ui.show_message("wumpus_attack", "event")
             self.player.is_alive = False
 
     # Logic fo shooting and steering arrows
-    def shoot_arrow(self, ui: TextUI):
+    def shoot_arrow(self, ui: GUI):
         # Early escape if no more arrows
         if self.player.arrows <= 0:
             ui.show_message("no_arrows", "warn")
@@ -593,7 +593,7 @@ class WumpusGame:
         ui.show_message("arrow_miss", "info")
 
     # Checks game status based on Wumpus existance or Player alive/arrows status
-    def check_game_state(self, ui: TextUI) -> str:
+    def check_game_state(self, ui: GUI) -> str:
         # If player is dead or has no arrows left, they lose
         if not self.player.is_alive:
             return "lose"
@@ -619,7 +619,7 @@ class WumpusGame:
             return False
 
     # Main method for playing a full turn of the game
-    def play_turn(self, ui: TextUI):
+    def play_turn(self, ui: GUI):
         senses = ui.display_senses(self.sense_environment())
         status = ui.display_status(self.player.current_room.room_id, 
                                      self.player.arrows, 
