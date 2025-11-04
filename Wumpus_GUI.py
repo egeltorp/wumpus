@@ -59,48 +59,77 @@ class GUI:
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
 
         # Tuple arguments for labels
-        self.font_title = ("Menlo", 22, "bold")
-        self.font_subtitle = ("Menlo", 16, "bold")
-        self.font_text = ("Menlo", 12)
+        self.font_title = ("Menlo", 24, "bold")
+        self.font_subtitle = ("Menlo", 20, "bold")
+        self.font_text = ("Menlo", 16)
 
         # Padding variables
-        self.pady_title = {"pady": (100, 20)}
+        self.pady_title = {"pady": (80, 20)}
+
+        # Instructions text + index
+        self.page_index = 0
+        self.pages = [
+            "PAGE 1\n\nHello 1\nBalls\nBalls... again!",
+            "PAGE 2\nHello 2\nBalls\nBalls... again!",
+            "PAGE 3\nHello 3\nBalls\nBalls... again!"
+        ]
 
         # Game starts with intro
         self.intro()
 
+    # Displays intro prompt to decide if skip or continute to either instructions or
     def intro(self):
         # Welcome
-        title = tk.Label(self.root, text="Welcome to Wumpus", font=self.font_title, bg="black", fg="white")
-        title.pack(**self.pady_title)
+        tk.Label(self.root, text="WELCOME", font=self.font_title, bg="black", fg="white").pack(**self.pady_title)
 
         # Prompt
-        prompt = tk.Label(self.root, text="> Would you like to SKIP the INTRO?", font=self.font_subtitle, bg="black", fg="white")
-        prompt.pack(pady=10)
+        tk.Label(self.root, text="> Would you like to SKIP the INTRO?", font=self.font_subtitle, bg="black", fg="white").pack(pady=10)
 
         # Skip / Continue
-        skip = tk.Button(self.root, text="SKIP", font=self.font_subtitle, bg="black", fg="white", width="20", command=self.choose_difficulty)
-        skip.pack(pady=(100, 20))
-        cont = tk.Button(self.root, text="CONTINUE", font=self.font_subtitle, bg="black", fg="white", width="20", command=self.start_intro)
-        cont.pack(pady=(0, 20))
+        tk.Button(self.root, text="SKIP", font=self.font_subtitle, cursor="hand2", bg="#101010", fg="white", width="20", relief="solid", command=self.choose_difficulty).pack(pady=(100, 40))
+        tk.Button(self.root, text="INTRO", font=self.font_subtitle, cursor="hand2", bg="#101010", fg="white", width="20", relief="solid", command=self.instructions).pack(pady=(0, 20))
 
-    def start_intro(self):
+    # Shows the instructions for the game, in pages
+    def instructions(self):
         self.clear() # Clears the previous tk layout
-        title = tk.Label(self.root, text="Instructions", font=self.font_title, bg="black", fg="white")
-        title.pack(**self.pady_title)
+        tk.Label(self.root, text="Instructions", font=self.font_title, bg="black", fg="white").pack(pady=(80, 0))
 
+        # Frame for displaying pages
+        frame = tk.Frame(self.root, bg="black", padx=4, pady=4)
+        frame.place(relx=0.5, rely=0.5, anchor="center")
+
+        text = tk.Label(frame, text=self.pages[self.page_index], wraplength=600, padx=30, pady=70, font=self.font_text, bg="black", fg="white")
+        text.pack()
+
+        # Nav buttons + frame container
+        button_frame = tk.Frame(self.root, bg="black")
+        button_frame.pack(side="bottom", pady=40)
+        
+        left_button = tk.Button(button_frame, text="<--", font=self.font_subtitle, cursor="hand2", bg="#101010", fg="white", width="8", relief="solid", command=self.back_page)
+        left_button.pack(side="left", padx=20)
+        
+        right_button = tk.Button(button_frame, text="-->", font=self.font_subtitle, cursor="hand2", bg="#101010", fg="white", width="8", relief="solid", command=self.next_page)
+        right_button.pack(side="left", padx=20)
+
+        continue_button = tk.Button(button_frame, text="CONTINUE", font=self.font_subtitle, cursor="hand2", bg="#101010", fg="white", width="10", relief="solid", command=self.choose_difficulty)
+        continue_button.pack(side="left", padx=20)
+
+    def back_page(self):
+        pass
+
+    def next_page(self):
+        pass
+
+
+    # Allows the user to select a difficulty level for the game
     def choose_difficulty(self):
         self.clear()
-        
-        title = tk.Label(self.root, text="DIFFICULTY", font=self.font_title, bg="black", fg="white")
-        title.pack(**self.pady_title)
+        tk.Label(self.root, text="DIFFICULTY", font=self.font_title, bg="black", fg="white").pack(**self.pady_title)
+        tk.Label(self.root, text="> Choose a difficulty level", font=self.font_subtitle, bg="black", fg="white").pack(pady=10)
 
-        prompt = tk.Label(self.root, text="> Choose a difficulty level", font=self.font_subtitle, bg="black", fg="white")
-        prompt.pack(pady=10)
 
         # Frame for buttons
-        frame = tk.Frame(self.root, bg="black")
-        frame.pack(pady=50)
+        tk.Frame(self.root, bg="black").pack(pady=50)
 
         easy_dict = {"num_rooms": 15, "pit_rate": 0.1, "bat_rate": 0.2, "starting_arrows": 6, "wumpus_chases": False}
         normal_dict = {"num_rooms": 20, "pit_rate": 0.2, "bat_rate": 0.3, "starting_arrows": 5, "wumpus_chases": False}
