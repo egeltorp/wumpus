@@ -1,4 +1,4 @@
-# wumpus
+# wumpus (Legacy UI)
 
 ### Version
 Legacy UI | B-grade | Print | One-file | Nov 4th 2025
