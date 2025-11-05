@@ -1,7 +1,7 @@
 '''
 Wumpus_GUI.py
 --------
-Version: Wumpus GUI | A-grade | Tkinter | One-file | Nov 2025
+Version: Tkinter GUI | A-grade | Tkinter | One-file | Nov 2025
 * Choose difficulty
 * Wumpus chases on HARD
 * One file for all code
@@ -26,20 +26,10 @@ from tkinter import messagebox
 
 # Main function initializing the program
 def main():
-    print("\nVersion: Wumpus GUI | A-grade | Tkinter | One-file | Nov 2025\n") # Print version number
-
+    print("\nTkinter GUI | A-grade | Tkinter | One-file | Nov 2025\n") # Print version number
     # Initialize the GUI interface + run tkinter mainloop
     ui = GUI()
     ui.run()
-
-    # Skip intro or not
-    
-    params = ui.choose_difficulty() # Choose difficulty, returns a dict with chosen parameters
-    game = WumpusGame(**params) # Create a new instance of the WumpusGame and set up game environment
-
-    # Run the full game
-
-    # Check if the user wants to play again, if YES: restart loop and run again
 
 # ==============================================================
 #                             G U I
@@ -58,10 +48,14 @@ class GUI:
         self.root.configure(bg="#000000")
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
 
-        # Tuple arguments for labels
-        self.font_title = ("Menlo", 24)
-        self.font_subtitle = ("Menlo", 20)
-        self.font_text = ("Menlo", 16)
+        # Game
+        self.game = None
+
+        # Arguments for styling
+        self.font_title = ("Segoe UI", 24)
+        self.font_subtitle = ("Segoe UI", 20)
+        self.font_text = ("Segoe UI", 16)
+        self.button_bg = "#101010"
 
         # Padding variables
         self.pady_title = {"pady": (80, 20)}
@@ -109,25 +103,25 @@ class GUI:
         tk.Label(self.root, text="> Would you like to SKIP the INTRO?", font=self.font_subtitle, bg="black", fg="white").pack(pady=10)
 
         # Skip / Continue
-        tk.Button(self.root, text="SKIP", font=self.font_subtitle, cursor="hand2", bg="#101010", fg="white", width="20", relief="solid", command=self.choose_difficulty).pack(pady=(100, 40))
-        tk.Button(self.root, text="INTRO", font=self.font_subtitle, cursor="hand2", bg="#101010", fg="white", width="20", relief="solid", command=self.instructions).pack(pady=(0, 20))
+        tk.Button(self.root, text="SKIP", font=self.font_subtitle, cursor="hand2", bg=self.button_bg, fg="white", width="20", relief="solid", command=self.choose_difficulty).pack(pady=(100, 40))
+        tk.Button(self.root, text="INTRO", font=self.font_subtitle, cursor="hand2", bg=self.button_bg, fg="white", width="20", relief="solid", command=self.instructions).pack(pady=(0, 20))
 
-        tk.Label(self.root, text="Version: Wumpus GUI | A-grade | Tkinter | One-file | Nov 2025", font=("Menlo", 10), bg="black", fg="white").pack(side="bottom", pady=2)
+        tk.Label(self.root, text="Tkinter GUI | A-grade | Tkinter | One-file | Nov 2025", font=("Segoe UI", 10), bg="black", fg="white").pack(side="bottom", pady=2)
 
     # Shows the instructions for the game, in pages
     def instructions(self):
         self.clear() # Clears the previous tk layout
         tk.Label(self.root, text="Instructions", font=self.font_title, bg="black", fg="white").pack(pady=(80, 0))
 
-        # Frame for displaying pages
+        # Frame for displaying page content
         frame = tk.Frame(self.root, bg="black", padx=4, pady=4)
         frame.place(relx=0.5, rely=0.5, anchor="center")
 
         # Shows current page number
-        self.page_number = tk.Label(self.root, text=f"PAGE {self.page_index + 1}", font=("Menlo", 20, "bold"), bg="black", fg="white")
+        self.page_number = tk.Label(self.root, text=f"PAGE {self.page_index + 1}", font=("Segoe UI", 20, "bold"), bg="black", fg="white")
         self.page_number.pack(pady=(20, 0)) 
 
-        # Frame content (Relevant instruction page)
+        # Page content for frame (Relevant instruction page)
         self.page_content = tk.Label(frame, text=self.pages[self.page_index], wraplength=600, padx=30, pady=20, font=self.font_text, bg="black", fg="white")
         self.page_content.pack()
 
@@ -136,17 +130,17 @@ class GUI:
         button_frame.pack(side="bottom", pady=40)
         
         self.left_button = tk.Button(button_frame, state="disabled", text="<--", font=self.font_subtitle, cursor="hand2", 
-                                     bg="#101010", fg="white", width="8", relief="solid", 
+                                     bg=self.button_bg, fg="white", width="8", relief="solid", 
                                      command=self.back_page)
         self.left_button.pack(side="left", padx=20)
         
         self.right_button = tk.Button(button_frame, text="-->", font=self.font_subtitle, cursor="hand2", 
-                                      bg="#101010", fg="white", width="8", relief="solid", 
+                                      bg=self.button_bg, fg="white", width="8", relief="solid", 
                                       command=self.next_page)
         self.right_button.pack(side="left", padx=20)
 
         self.continue_button = tk.Button(button_frame, state="disabled", text="CONTINUE", font=self.font_subtitle, cursor="hand2", 
-                                         bg="#101010", fg="white", width="10", relief="solid", 
+                                         bg=self.button_bg, fg="green", width="10", relief="solid", 
                                          command=self.choose_difficulty)
         self.continue_button.pack(side="left", padx=20)
 
@@ -169,84 +163,92 @@ class GUI:
         if self.page_index == len(self.pages) - 1:
             self.continue_button.config(state="normal")
 
-    # Allows the user to select a difficulty level for the game
+    # User selects a difficulty level and the game is initialized with chosen parameters
     def choose_difficulty(self):
+        # Dictionaries with game difficulty parameters
+        easy = {"num_rooms": 15, "pit_rate": 0.1, "bat_rate": 0.2, "starting_arrows": 6, "wumpus_chases": False}
+        normal = {"num_rooms": 20, "pit_rate": 0.2, "bat_rate": 0.3, "starting_arrows": 5, "wumpus_chases": False}
+        hard = {"num_rooms": 30, "pit_rate": 0.25, "bat_rate": 0.35, "starting_arrows": 3, "wumpus_chases": True}
+
+        # Layout init
         self.clear()
         tk.Label(self.root, text="DIFFICULTY", font=self.font_title, bg="black", fg="white").pack(**self.pady_title)
         tk.Label(self.root, text="> Choose a difficulty level", font=self.font_subtitle, bg="black", fg="white").pack(pady=10)
 
-        # Frame for buttons
-        tk.Frame(self.root, bg="black").pack(pady=50)
+        # Container for buttons
+        frame = tk.Frame(self.root, bg="black", padx=4, pady=4)
+        frame.place(relx=0.5, rely=0.65, anchor="center")
 
-        easy_dict = {"num_rooms": 15, "pit_rate": 0.1, "bat_rate": 0.2, "starting_arrows": 6, "wumpus_chases": False}
-        normal_dict = {"num_rooms": 20, "pit_rate": 0.2, "bat_rate": 0.3, "starting_arrows": 5, "wumpus_chases": False}
-        hard_dict = {"num_rooms": 30, "pit_rate": 0.25, "bat_rate": 0.35, "starting_arrows": 3, "wumpus_chases": True}
+        # Difficulty buttons
+        easy_button = tk.Button(frame, text="EASY", font=self.font_subtitle, cursor="hand2", 
+                                     bg=self.button_bg, fg="green", width="16", relief="solid", 
+                                     command=lambda: self.create_game(easy))
+        easy_button.pack(pady=25)
+        
+        normal_button = tk.Button(frame, text="NORMAL", font=self.font_subtitle, cursor="hand2", 
+                                      bg=self.button_bg, fg="yellow", width="16", relief="solid", 
+                                      command=lambda: self.create_game(normal))
+        normal_button.pack(pady=25)
 
-    def game_layout(self):
-        # Info Panels
-        info_frame = tk.Frame(self.root, bg="#000000")
-        info_frame.pack(fill="x", padx=10, pady=5)
+        hard_button = tk.Button(frame, text="HARD", font=self.font_subtitle, cursor="hand2", 
+                                      bg=self.button_bg, fg="red", width="16", relief="solid", 
+                                      command=lambda: self.create_game(hard))
+        hard_button.pack(pady=25)
 
-        self.senses_label = tk.Label(info_frame, text="SENSES: None", anchor="w", bg=self.black, fg="#FFF200", font=(self.font, 16))
-        self.senses_label.pack(fill="x", padx=10, pady=2)
 
-        self.status_label = tk.Label(info_frame, text="STATUS:", anchor="w", bg=self.black, fg="#AA00AA", font=(self.font, 16))
-        self.status_label.pack(fill="x", padx=10, pady=2)
+    def create_game(self, difficulty_dict: dict):
+        self.game = WumpusGame(**difficulty_dict) # Create a new instance of the WumpusGame and set up game environment
+        self.sense_dict = self.game.sense_environment()
+        self.run_game()
 
-    # Displays the difficulty levels in neat columns
-    def display_difficulties(self):
-        easy = """- EASY -
-Rooms: 15
-Pits: 10%
-Bats: 20%
-Arrows: 6
-Wumpus lurks...
-"""
-
-        normal = """- NORMAL -
-Rooms: 20
-Pits: 20%
-Bats: 35%
-Arrows: 5
-Wumpus lurks...
-"""
-
-        hard = """- HARD -
-Rooms: 30
-Pits: 25%
-Bats: 35%
-Arrows: 3
-Wumpus will CHASE you!
-"""
-
-    # General method for displaying a text message
-    def show_message(self, key: str, type: str):
-        # Get message to show
-        text = self.messages.get(key)
-
-        # Display style based on type
-        if type == "prompt":
-            print(f"> {text}")
-        if type == "action":
-            print(f"... {text}")
-        if type == "info":
-            print(f"--- {text}")
-        if type == "warn":
-            print(f"*** {text}")
-        if type == "event":
-            print(f"!!! {text}")
-        if type == "invalid":
-            print(f"XXX {text}")
+    def run_game(self):
+        self.clear()
+        self.top_panel()
+        tk.Button(self.root, text="move randomly", width=20, height=20, bg="red", command=lambda: (self.game.move_player(), self.update_panels())).pack(pady=10)
     
-    # Displays status of player: current room, no. of arrows, nearby rooms
-    def display_status(self, current_room_id: int, arrows: int, nearby_rooms: list):
-        lines = []
-        room_ids = [r.room_id for r in nearby_rooms]
-        rooms_formatted = "  ".join(f"{r:>2}" for r in room_ids)
+    def top_panel(self):
+        # Data from WumpusGame
+        self.sense_dict = self.game.sense_environment()
+        room_ids = [r.room_id for r in self.game.player.current_room.connected_rooms]
+        room_list = "  ".join(f"{r:>2}" for r in room_ids)
 
-        print(f"--- You are in room {current_room_id}.")
-        print(f"--- You have {arrows} arrows left.")
-        print(f"--- Nearby rooms: {rooms_formatted}\n")
+        # Frame for displaying STATUS and SENSES
+        top_frame = tk.Frame(self.root, bg="black", height=200)
+        top_frame.pack(side="top", fill="x", pady=(20, 0))
+        top_frame.pack_propagate(False)
+
+        # STATUS panel
+        self.status_frame = tk.Frame(top_frame, bg=self.button_bg, bd=2, padx=10, pady=0, width=350, relief="solid")
+        self.status_frame.pack(side="left", expand=False, fill="both", padx=10, pady=0)
+        self.status_frame.pack_propagate(False)
+        tk.Label(self.status_frame, text="STATUS", bg=self.button_bg, fg="magenta", font=self.font_text).pack(pady=(0, 10))
+        
+        self.current_room_label = tk.Label(self.status_frame, text=f"You are in Room {self.game.player.current_room.room_id}", bg=self.button_bg, fg="white", font=self.font_text)
+        self.current_room_label.pack(pady=(0, 10))
+
+        self.nearby_rooms_label = tk.Label(self.status_frame, text=f"Nearby rooms: {room_list}", bg=self.button_bg, fg="white", font=self.font_text)
+        self.nearby_rooms_label.pack(pady=(0, 10))
+        
+        self.arrows_label = tk.Label(self.status_frame, text=f"Arrows left: {self.game.player.arrows}", bg=self.button_bg, fg="white", font=self.font_text)
+        self.arrows_label.pack(pady=(0, 10))
+
+        # SENSES panel
+        self.senses_frame = tk.Frame(top_frame, bg=self.button_bg, bd=2, padx=10, pady=0, width=400, relief="solid")
+        self.senses_frame.pack(side="right", expand=False, fill="both", padx=10, pady=0)
+        self.senses_frame.pack_propagate(False)
+        tk.Label(self.senses_frame, text="SENSES", bg=self.button_bg, fg="yellow", font=self.font_text).pack(pady=(0, 10))
+        self.senses_label = tk.Label(self.senses_frame, text=f"{self.sense_dict}", bg=self.button_bg, fg="white", font=self.font_text)
+        self.senses_label.pack(pady=(0, 10))
+
+    # Displays status of player: current room, no. of arrows, nearby rooms
+    def update_panels(self):
+        room_ids = [r.room_id for r in self.game.player.current_room.connected_rooms]
+        room_list = "  ".join(f"{r:>2}" for r in room_ids)
+
+        self.current_room_label.config(text=f"You are in Room {self.game.player.current_room.room_id}")
+        self.nearby_rooms_label.config(text=f"Nearby rooms: {room_list}")
+        self.arrows_label.config(text=f"Arrows left: {self.game.player.arrows}")
+        self.senses_label.config(text=f"{self.sense_dict}")
 
     # Asks user for desired action [M]ove or [S]hoot, returns str
     def ask_action(self) -> str:
@@ -303,43 +305,6 @@ Wumpus will CHASE you!
         time.sleep(0.3)
         print(f"You are now in room {new_room_id}\n")
         time.sleep(0.5)
-
-    # Shows welcome title and intro text (if desired by user)
-    def show_welcome(self):
-        # Intro text lines
-        lines = [
-            "> You find yourself in the culverts beneath Hardox, where the gluttonous WUMPUS resides.",
-            "> To avoid being eaten you have to shoot WUMPUS with your bow and arrow.",
-            "> The culverts are all connected to a number of rooms via cramped tunnels.",
-            "> You can move North, East, South, or West from one room to another.",
-            "> Here lurks a number of dangers however:",
-            "- Some rooms contain BOTTOMLESS PITS, and falling into one means certain death.",
-            "- Others contain BATS, which will fly you to a random room of their choosing.",
-            "> In one of the rooms... lurks the mighty WUMPUS.",
-            "> If encountered, he will instantly gobble you up and you WILL die.",
-            "> Luckily, via the SENSES DISPLAY you can feel the cold breeze of a pit nearby, or the flapping of wings...",
-            "> ...or the stench of WUMPUS.",
-            "> Via the STATUS BAR you can see: ",
-            "- The room you are currently in",
-            "- Nearby rooms.",
-            "- How many arrows you have left.",
-            "X To win the game you have to shoot and kill WUMPUS.",
-            "X When you shoot an arrow it will move through THREE rooms.",
-            "X You can direct the arrow's direction in each room it enters.",
-            "X Be careful however! The tunnels wind in unexpected ways...",
-            "X You might shoot yourself! Bozo.",
-            "X You have FIVE arrows.",
-            "> Qapla' and good luck!"
-        ]
-
-        # "Animates" each letter during the intro
-        for line in lines:
-            for char in line:
-                print(char, end="")
-                sys.stdout.flush()
-                time.sleep(0.03)
-            print()
-            time.sleep(0.5)
 
     # Displays the result of the game after game is over
     def show_result(self, result: str):
@@ -421,6 +386,12 @@ class WumpusGame:
         self.connect_rooms()
         self.place_hazards()
         self.place_player()
+        self.debug()
+
+    def debug(self):
+        for room in self.rooms:
+            connected_ids = [r.room_id for r in room.connected_rooms]
+            print(f"ROOM {room.room_id} --> connected to {connected_ids}")
 
     # Assigns a seed for the random module for reproducability
     def random_seed(self):
@@ -434,7 +405,7 @@ class WumpusGame:
     # Connects all rooms to each other in both ways
     def connect_rooms(self):
         number_of_connections = 4   # each room needs 4 connections
-        safety_limit = 500          # loop safety limit to stop infinite looping
+        safety_limit = 5000          # loop safety limit to stop infinite looping
 
         # Run this code for each room in self.rooms
         for room in self.rooms:
@@ -466,17 +437,20 @@ class WumpusGame:
         pit_rooms = random.sample(self.rooms, number_of_pits)
         for room in pit_rooms:
             room.has_pit = True
+            print(f"PIT in ROOM {room.room_id}")
 
         # Place bats in bat rooms making sure pit rooms are ignored
         empty_rooms = [room for room in self.rooms if not room.has_pit]
         bat_rooms = random.sample(empty_rooms, number_of_bats)
         for room in bat_rooms:
             room.has_bats = True
+            print(f"BAT in ROOM {room.room_id}")
 
         # Place Wumpus in a random empty room
         empty_room = [room for room in self.rooms if not room.has_pit and not room.has_bats]
         self.wumpus_room = random.choice(empty_room)
         self.wumpus_room.has_wumpus = True
+        print(f"WUMPUS in ROOM {self.wumpus_room.room_id}")
 
         # Store safe rooms
         self.safe_rooms = [room for room in self.rooms if not room.has_pit and not room.has_bats and not room.has_wumpus]
@@ -556,13 +530,8 @@ class WumpusGame:
         return sense_dict
     
     # Logic for moving the player, using ui.ask_direction for desired direction
-    def move_player(self, ui: GUI):
-        connected_rooms = self.player.current_room.connected_rooms
-        direction = ui.ask_direction(self.player.current_room.room_id, "move") # returns N,E,S,W string
-        target_room_obj = connected_rooms[direction]
-        self.player.current_room = target_room_obj
-        ui.show_move_transition(self.player.current_room.room_id, "move") # show moving animation
-        return
+    def move_player(self):
+        self.player.current_room = random.choice(self.rooms)
 
     # Checks if player has entered a room with a pit
     def check_pit_kill(self, ui: GUI):
@@ -690,16 +659,3 @@ messages = {
     "normal": "You chose NORMAL",
     "hard": "You chose HARD",
 }
-
-'''
-| Name    | Hex       
-| ------- | --------- 
-| black   | `#000000` 
-| red     | `#AA0000` 
-| green   | `#00AA00` 
-| yellow  | `#AA5500` 
-| blue    | `#0000AA` 
-| magenta | `#AA00AA` 
-| cyan    | `#00AAAA` 
-| white   | `#AAAAAA`
-'''
