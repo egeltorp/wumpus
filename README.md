@@ -1,6 +1,11 @@
 # wumpus
+### Versions available
+- Rich TextUI | B-grade | Rich | One-file | Nov 2025
+- Legacy UI | B-grade | Print | One-file | Nov 2025
+- Tkinter GUI | A-grade | Tkinter | One-file | Nov 2025
+
 ### Version
-B-grade | Rich | One-file | Nov 2025
+- Rich TextUI | B-grade | Rich | One-file | Nov 2025
 
 ### File structure
 - Wumpus.py
