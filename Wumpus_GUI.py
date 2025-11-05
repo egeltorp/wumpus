@@ -59,8 +59,8 @@ class GUI:
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
 
         # Tuple arguments for labels
-        self.font_title = ("Menlo", 24, "bold")
-        self.font_subtitle = ("Menlo", 20, "bold")
+        self.font_title = ("Menlo", 24)
+        self.font_subtitle = ("Menlo", 20)
         self.font_text = ("Menlo", 16)
 
         # Padding variables
@@ -69,9 +69,32 @@ class GUI:
         # Instructions text + index
         self.page_index = 0
         self.pages = [
-            "PAGE 1\n\nHello 1\nBalls\nBalls... again!",
-            "PAGE 2\nHello 2\nBalls\nBalls... again!",
-            "PAGE 3\nHello 3\nBalls\nBalls... again!"
+            # Page 1
+            "\n\nYou find yourself in the culverts beneath Hardox, where the gluttonous WUMPUS resides"
+            "\n\nThe culverts are all connected to a number of rooms via cramped tunnels"
+            "\n\nYou can move North, East, South, or West from one room to another",
+            # Page 2
+            "\n\nHere lurks a number of dangers however:"
+            "\n\n- Some rooms contain BOTTOMLESS PITS, and falling into one means certain death"
+            "\n\n- Others contain BATS, which will fly you to a random room of their choosing",
+            # Page 3
+            "\n\nIn one of the rooms... lurks the mighty WUMPUS"
+            "\n\nIf encountered, he will instantly gobble you up and you WILL die",
+            # Page 4
+            "\n\nLuckily, via the SENSES DISPLAY you can feel the cold breeze of a pit nearby, or the flapping of wings..."
+            "\n\n...or the stench of WUMPUS!",
+            # Page 5
+            "\n\nVia the STATUS DISPLAY you can see:"
+            "\n\nThe ROOM you are currently in, and any nearby rooms"
+            "\n\nAs well as the number of ARROWS you have left",
+            # Page 6
+            "\n\nTo win the game you have to shoot and kill WUMPUS"
+            "\n\nWhen you shoot an arrow it will move through THREE rooms"
+            "\n\nYou can direct the arrow's direction in each room it enters",
+            # Page 7
+            "\n\nBe careful however! The tunnels wind in unexpected ways..."
+            "\n\nYou might shoot yourself!"
+            "\n\nQapla' and good luck!",
         ]
 
         # Game starts with intro
@@ -89,6 +112,8 @@ class GUI:
         tk.Button(self.root, text="SKIP", font=self.font_subtitle, cursor="hand2", bg="#101010", fg="white", width="20", relief="solid", command=self.choose_difficulty).pack(pady=(100, 40))
         tk.Button(self.root, text="INTRO", font=self.font_subtitle, cursor="hand2", bg="#101010", fg="white", width="20", relief="solid", command=self.instructions).pack(pady=(0, 20))
 
+        tk.Label(self.root, text="Version: Wumpus GUI | A-grade | Tkinter | One-file | Nov 2025", font=("Menlo", 10), bg="black", fg="white").pack(side="bottom", pady=2)
+
     # Shows the instructions for the game, in pages
     def instructions(self):
         self.clear() # Clears the previous tk layout
@@ -98,35 +123,57 @@ class GUI:
         frame = tk.Frame(self.root, bg="black", padx=4, pady=4)
         frame.place(relx=0.5, rely=0.5, anchor="center")
 
-        text = tk.Label(frame, text=self.pages[self.page_index], wraplength=600, padx=30, pady=70, font=self.font_text, bg="black", fg="white")
-        text.pack()
+        # Shows current page number
+        self.page_number = tk.Label(self.root, text=f"PAGE {self.page_index + 1}", font=("Menlo", 20, "bold"), bg="black", fg="white")
+        self.page_number.pack(pady=(20, 0)) 
 
-        # Nav buttons + frame container
+        # Frame content (Relevant instruction page)
+        self.page_content = tk.Label(frame, text=self.pages[self.page_index], wraplength=600, padx=30, pady=20, font=self.font_text, bg="black", fg="white")
+        self.page_content.pack()
+
+        # Nav buttons and container for them
         button_frame = tk.Frame(self.root, bg="black")
         button_frame.pack(side="bottom", pady=40)
         
-        left_button = tk.Button(button_frame, text="<--", font=self.font_subtitle, cursor="hand2", bg="#101010", fg="white", width="8", relief="solid", command=self.back_page)
-        left_button.pack(side="left", padx=20)
+        self.left_button = tk.Button(button_frame, state="disabled", text="<--", font=self.font_subtitle, cursor="hand2", 
+                                     bg="#101010", fg="white", width="8", relief="solid", 
+                                     command=self.back_page)
+        self.left_button.pack(side="left", padx=20)
         
-        right_button = tk.Button(button_frame, text="-->", font=self.font_subtitle, cursor="hand2", bg="#101010", fg="white", width="8", relief="solid", command=self.next_page)
-        right_button.pack(side="left", padx=20)
+        self.right_button = tk.Button(button_frame, text="-->", font=self.font_subtitle, cursor="hand2", 
+                                      bg="#101010", fg="white", width="8", relief="solid", 
+                                      command=self.next_page)
+        self.right_button.pack(side="left", padx=20)
 
-        continue_button = tk.Button(button_frame, text="CONTINUE", font=self.font_subtitle, cursor="hand2", bg="#101010", fg="white", width="10", relief="solid", command=self.choose_difficulty)
-        continue_button.pack(side="left", padx=20)
+        self.continue_button = tk.Button(button_frame, state="disabled", text="CONTINUE", font=self.font_subtitle, cursor="hand2", 
+                                         bg="#101010", fg="white", width="10", relief="solid", 
+                                         command=self.choose_difficulty)
+        self.continue_button.pack(side="left", padx=20)
 
     def back_page(self):
-        pass
+        if self.page_index > 0:
+            self.page_index -= 1
+            self.page_content.config(text=self.pages[self.page_index])
+            self.update_buttons()
 
     def next_page(self):
-        pass
+        if self.page_index < len(self.pages) - 1:
+            self.page_index += 1
+            self.page_content.config(text=self.pages[self.page_index])
+            self.update_buttons()
 
+    def update_buttons(self):
+        self.page_number.config(text=f"PAGE {self.page_index + 1}")
+        self.left_button.config(state="normal" if self.page_index > 0 else "disabled")
+        self.right_button.config(state="normal" if self.page_index < len(self.pages) - 1 else "disabled")
+        if self.page_index == len(self.pages) - 1:
+            self.continue_button.config(state="normal")
 
     # Allows the user to select a difficulty level for the game
     def choose_difficulty(self):
         self.clear()
         tk.Label(self.root, text="DIFFICULTY", font=self.font_title, bg="black", fg="white").pack(**self.pady_title)
         tk.Label(self.root, text="> Choose a difficulty level", font=self.font_subtitle, bg="black", fg="white").pack(pady=10)
-
 
         # Frame for buttons
         tk.Frame(self.root, bg="black").pack(pady=50)
