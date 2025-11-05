@@ -1,7 +1,7 @@
 # wumpus (Tkinter GUI)
 
 ### Version
-GUI | A-grade | Tkinter | One-file | Nov 2025
+Tkinter GUI | A-grade | Tkinter | One-file | Nov 2025
 
 ### File structure
 - Wumpus_GUI.py
@@ -10,13 +10,12 @@ GUI | A-grade | Tkinter | One-file | Nov 2025
 ### Requirements
 - Python 3.x
 - tkinter
-- 'Menlo' font
 
 ### Project Assignment (LAB3)
 An individual programming assignment in Python consisting of the following four parts.  
 Expect to spend about <ins>80 hours of work</ins>.  
 Time spent on the GUI Version:  
-Session 1: 6h ---> 04-11-2025, 19:00 > 05-11-2025, 01:00
+Session 1: 9h
 
 
 **Components of the Project Assignment:**
