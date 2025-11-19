@@ -105,7 +105,7 @@ class TextUI:
         
         self.messages = {
             "no_arrows": "You have no arrows left!\n",
-            "arrow_miss": "Your arrow missed.\n",
+            "arrow_miss": "Your arrow [bold]missed[/bold].\n",
             "wumpus_attack": "[bold red]The Wumpus SLOBBERS on your FLESH![/bold red]\n",
             "wumpus_move": "[italic red]The Wumpus stomps closer![/italic red]\n",
             "wumpus_hit": "The Wumpus has been struck!\n",
@@ -165,7 +165,6 @@ class TextUI:
     # General method for displaying a text message
     def show_message(self, key: str):
         text = self.messages.get(key)
-        text_formatted = Text.from_markup(text)
         self.console.print(f"{text}")
 
     # Displays "senses" based on sense_environment() in WumpusGame
